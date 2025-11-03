@@ -36,7 +36,6 @@ With this project you can edit your **name**, **username**, **birthday**, and **
    ```bash
    git clone https://github.com/power0matin/birthday-cake-generator.git
    cd birthday-cake-generator
-````
 
 2. **Open** `index.html` in your browser.
 3. Customize your text and colors.
