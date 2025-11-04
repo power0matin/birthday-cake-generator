@@ -1,11 +1,21 @@
-/* --- Print setup --- */
+/* --- Print: centered A4 landscape with safe margin --- */
 @page {
   size: A4 landscape;
-  margin: 10mm;
+  margin: 0;
 }
 
 @media print {
+  :root {
+    --print-margin: 10mm;
+  }
+
+  html,
   body {
+    width: 297mm;
+    height: 210mm;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
@@ -14,23 +24,44 @@
     display: none !important;
   }
 
-  /* فقط خود پوستر چاپ شود */
-  .app {
-    grid-template-columns: 1fr !important;
-  }
-
-  /* فضای چاپ تمیز */
+  .app,
   .stage-wrap {
+    width: 297mm !important;
+    height: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     overflow: visible !important;
   }
 
   .sheet {
+    width: calc(297mm - 2 * var(--print-margin)) !important;
+    height: calc(210mm - 2 * var(--print-margin)) !important;
+    margin: 0 !important;
+    padding: 10mm !important;
     box-shadow: none !important;
+    border-radius: 4mm !important;
+    page-break-before: avoid !important;
+    page-break-after: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .code-card {
+    overflow: hidden !important;
+    box-shadow: none !important;
+  }
+
+  * {
+    break-inside: avoid;
   }
 }
 
+
 /* --- Design tokens --- */
 :root {
+  /* Poster (scoped to #sheet via JS) */
   --bg: #ffffff;
   --ink: #111111;
   --kw: #ff5722;
@@ -39,20 +70,36 @@
   --str: #1565c0;
   --num: #d32f2f;
   --accent: #212121;
-  --border: #e0e0e0;
+  --border: #dfe3ea;
   --codebg: #fafafa;
   --punct: #444444;
 
+  /* App surfaces (non-sheet) */
+  --app-bg: #eef1f5;
+  --surface: #f7f8fb;
+  --surface-2: #ffffff;
 
+  /* Buttons */
+  --btn: #2e7d32;
+  /* primary */
+  --btn-text: #ffffff;
+  --btn-border: #cfd6e3;
+  --btn-neutral: #f0f3f8;
+
+  /* Focus & misc */
+  --focus: rgba(46, 125, 50, 0.25);
+
+  /* Radii / spacing */
   --radius-lg: 12px;
   --radius-md: 10px;
   --radius-sm: 8px;
   --gap: 16px;
   --gap-sm: 8px;
 
-  --panel-bg: #fff;
-  --panel-border: #e6e6e6;
-  --card-bg: #fafafa;
+  /* Backward-compat */
+  --panel-bg: var(--surface);
+  --panel-border: #d9dde6;
+  --card-bg: var(--surface-2);
 }
 
 /* --- Global --- */
@@ -60,11 +107,12 @@
   box-sizing: border-box;
 }
 
+/* --- Global (adjust background) --- */
 html,
 body {
   height: 100%;
   margin: 0;
-  background: #f5f5f5;
+  background: var(--app-bg);
   color: var(--ink);
   font-family: "JetBrains Mono", "Fira Code", monospace;
   -webkit-font-smoothing: antialiased;
@@ -79,15 +127,15 @@ body {
 /* --- Layout --- */
 .app {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: minmax(360px, 420px) 1fr;
   height: 100vh;
   gap: var(--gap);
   padding: var(--gap);
 }
 
-/* Panel */
+/* --- Panel: clearer separation --- */
 .panel {
-  background: var(--panel-bg);
+  background: var(--surface);
   border: 1px solid var(--panel-border);
   border-radius: var(--radius-lg);
   padding: var(--gap);
@@ -95,6 +143,26 @@ body {
   flex-direction: column;
   gap: 12px;
   position: relative;
+  box-shadow: 0 10px 25px rgba(17, 24, 39, .06);
+}
+
+.panel details[open] {
+  background: var(--surface-2);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+  border: 1px solid #ccd3de;
+}
+
+.panel details summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #333;
+  list-style: none;
+  outline: none;
+  margin-bottom: 6px;
+}
+
+.panel details summary::-webkit-details-marker {
+  display: none;
 }
 
 .panel h1 {
@@ -111,7 +179,7 @@ body {
 .panel input[type="text"],
 .panel input[type="date"] {
   padding: 10px 12px;
-  border: 1px solid #ddd;
+  border: 1px solid #d8dee9;
   border-radius: var(--radius-sm);
   font-family: inherit;
   background: #fff;
@@ -121,22 +189,23 @@ body {
 
 .panel input[type="text"]:focus,
 .panel input[type="date"]:focus {
-  border-color: #bbb;
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, .06);
+  border-color: #b8c2d6;
+  box-shadow: 0 0 0 4px var(--focus);
 }
 
+/* Buttons: neutral vs primary */
 .panel button {
   padding: 10px 12px;
-  border: 1px solid #ddd;
-  background: #fafafa;
+  border: 1px solid var(--btn-border);
+  background: var(--btn-neutral);
   border-radius: var(--radius-md);
   cursor: pointer;
   font-family: inherit;
-  transition: background .15s ease, transform .04s ease;
+  transition: background .15s ease, transform .04s ease, box-shadow .15s ease;
 }
 
 .panel button:hover {
-  background: #f0f0f0;
+  background: #e7ebf3;
 }
 
 .panel button:active {
@@ -144,16 +213,76 @@ body {
 }
 
 .panel details {
-  border: 1px dashed #e0e0e0;
-  border-radius: var(--radius-sm);
-  padding: 8px;
+  background: var(--surface-2);
+  border: 1px dashed #d9dde6;
+  border-radius: var(--radius-md);
+  padding: 10px;
+  transition: all 0.2s ease;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+/* Make bottom action buttons primary (Save/Export/Print) */
+.row.stick-bottom button {
+  background: var(--btn);
+  color: var(--btn-text);
+  border-color: transparent;
+  box-shadow: 0 8px 16px rgba(46, 125, 50, .18);
+}
+
+.row.stick-bottom button:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 10px 22px rgba(46, 125, 50, .22);
+}
+
+.row.stick-bottom button:active {
+  transform: translateY(1px);
 }
 
 .grid.colors {
+  margin-top: 10px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  margin-top: 8px;
+  max-height: 260px;
+  /* prevents overflow */
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.grid.colors::-webkit-scrollbar {
+  width: 6px;
+}
+
+.grid.colors::-webkit-scrollbar-thumb {
+  background: #c3cad4;
+  border-radius: 4px;
+}
+
+/* Details of color grid look like cards */
+.grid.colors label {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: var(--surface);
+  border: 1px solid #e1e6ee;
+  transition: background 0.2s ease;
+}
+
+.grid.colors input[type="color"] {
+  width: 40px;
+  height: 28px;
+  border: 1px solid #cfd6e3;
+  border-radius: 6px;
+  padding: 0;
+  background: #fff;
+}
+
+.grid.colors label:hover {
+  background: #eef1f5;
 }
 
 .row {
@@ -230,7 +359,6 @@ body {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  /* حاشیه‌ها تمیز */
 }
 
 .sheet {
@@ -313,18 +441,15 @@ pre {
     order: -1;
   }
 
-  /* پوستر بالا، تنظیمات پایین */
   .sheet {
     width: 100%;
     height: auto;
   }
 
-  /* برای موبایل اجازه ارتفاع خودکار */
   pre {
     font-size: 4.6mm;
   }
 
-  /* خواناتر روی موبایل */
 }
 
 @media (max-width: 560px) {
@@ -337,7 +462,6 @@ pre {
   }
 }
 
-/* دکمه‌های کار با رنگ‌ها */
 .color-actions button {
   font-size: 12px;
   padding: 8px 10px;
@@ -347,20 +471,4 @@ pre {
 .color-actions {
   margin-top: 10px;
   gap: 6px;
-}
-
-.grid.colors label {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 8px;
-}
-
-.grid.colors input[type="color"] {
-  width: 40px;
-  height: 28px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 0;
-  background: #fff;
 }

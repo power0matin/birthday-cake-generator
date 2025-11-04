@@ -67,14 +67,12 @@ const defaults = {
   },
 };
 
-// ست کردن CSS Variables (با اسم‌هایی مثل --bg, --ink, ...)
 function setCSSVars(colors, scope = els.sheet) {
   Object.entries(colors).forEach(([k, v]) =>
     scope.style.setProperty(`--${k}`, v)
   );
 }
 
-// جلوگیری از اینجکشن
 function escapeHtml(s = "") {
   return String(s)
     .replace(/&/g, "&amp;")
@@ -85,7 +83,6 @@ function escapeHtml(s = "") {
 }
 
 function updateCode(name, user, birthday) {
-  // تاریخ معتبر YYYY-MM-DD
   let y = 2000,
     m = 1,
     d = 1;
@@ -162,7 +159,6 @@ function randHex() {
   );
 }
 
-// کمی هدایت‌شده: پس‌زمینه روشن/تیره با کنتراست معقول
 function randomPalette() {
   const light = Math.random() > 0.5;
   const bg = light ? "#ffffff" : "#121212";
@@ -203,21 +199,17 @@ function loadTheme() {
   }
 }
 
-// همگام‌سازی UI با خروجی
 function applyInputs() {
   const name = els.name.value.trim() || defaults.name;
   const user = els.username.value.trim() || defaults.username;
   const bday = els.birthday.value || defaults.birthday;
 
-  // نمایش عنوان و یوزرنیم
   els.outName.innerHTML = escapeHtml(name).replace(/\s/g, "&nbsp;");
   els.outUser.textContent = user;
 
-  // کد پایتون-مانند
   updateCode(name, user, bday);
 }
 
-// پر کردن فرم با پیش‌فرض‌ها
 function loadDefaults() {
   els.name.value = defaults.name;
   els.username.value = defaults.username;
@@ -225,7 +217,6 @@ function loadDefaults() {
 
   setCSSVars(defaults.colors);
 
-  // ست کردن پیکرهای رنگ
   els.clrBg.value = defaults.colors.bg;
   els.clrInk.value = defaults.colors.ink;
   els.clrKw.value = defaults.colors.kw;
@@ -238,7 +229,6 @@ function loadDefaults() {
   applyInputs();
 }
 
-// دانلود دیتای URL (سازگار با فایرفاکس)
 function download(dataUrl, filename) {
   const a = document.createElement("a");
   a.href = dataUrl;
@@ -249,10 +239,8 @@ function download(dataUrl, filename) {
   a.remove();
 }
 
-// خروجی PNG با کیفیت بالا
 async function savePNG() {
   const node = els.sheet;
-  // بعد از رندر فونت‌ها
   await document.fonts?.ready?.catch(() => {});
   const dataUrl = await htmlToImage.toPng(node, {
     pixelRatio: 2,
@@ -261,7 +249,6 @@ async function savePNG() {
   download(dataUrl, `cake-poster-${Date.now()}.png`);
 }
 
-// خروجی PDF A4 افقی
 async function savePDF() {
   const node = els.sheet;
   await document.fonts?.ready?.catch(() => {});
@@ -276,14 +263,11 @@ async function savePDF() {
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
 
-  // پر کردن تمام صفحه (حاشیه‌ها در دیزاین خود شیت لحاظ شده)
   pdf.addImage(dataUrl, "PNG", 0, 0, pageW, pageH, undefined, "FAST");
   pdf.save(`cake-poster-${Date.now()}.pdf`);
 }
 
-// بایند کردن رویدادها
 function bind() {
-  // همگام‌سازی ورودی‌های متنی و تاریخ
   ["input", "change"].forEach((ev) => {
     els.name.addEventListener(ev, applyInputs);
     els.username.addEventListener(ev, applyInputs);
@@ -299,8 +283,8 @@ function bind() {
         str: els.clrStr.value,
         num: els.clrNum.value,
         border: els.clrBorder.value,
-        codebg: els.clrCodeBg.value, // ✅ جدید
-        punct: els.clrPunct.value, // ✅ جدید
+        codebg: els.clrCodeBg.value,
+        punct: els.clrPunct.value,
       });
 
     [
@@ -313,13 +297,12 @@ function bind() {
       els.clrNum,
       els.clrBorder,
       els.clrCodeBg,
-      els.clrPunct, // ✅ جدید
+      els.clrPunct,
     ].forEach((el) =>
       ["input", "change"].forEach((ev) => el.addEventListener(ev, colorHandler))
     );
   });
 
-  // پرِست‌ها
   els.presetWarm.onclick = () =>
     setCSSVars({
       bg: "#ffffff",
@@ -356,29 +339,24 @@ function bind() {
       border: "#333333",
     });
 
-  // اکشن‌ها
   els.btnPNG.onclick = savePNG;
   els.btnPDF.onclick = savePDF;
   els.btnPrint.onclick = () => window.print();
 }
-// رنگ‌ها از پیکرها به CSS
 const colorHandler = () => applyPickerColors();
-// ... لیست addEventListener موجود برای کلرها تغییری نکند
 
-// دکمه Reset: برگشت به defaults
 els.btnResetColors.onclick = () => {
   setPickers(defaults.colors);
   setCSSVars(defaults.colors);
 };
 
-// دکمه Random: تولید پالت تصادفی
 els.btnRandomColors.onclick = () => {
   const pal = randomPalette();
   setPickers(pal);
   setCSSVars(pal);
 };
 
-// Save / Load در localStorage
+// Save / Load
 els.btnSaveTheme.onclick = () => {
   const c = getPickerColors();
   saveTheme(c);
@@ -434,10 +412,9 @@ els.inpImportTheme.onchange = async (e) => {
   }
 };
 
-// شروع
 window.addEventListener("DOMContentLoaded", () => {
-  els.clrCodeBg.value = defaults.colors.codebg; // ✅
-  els.clrPunct.value = defaults.colors.punct; // ✅
+  els.clrCodeBg.value = defaults.colors.codebg;
+  els.clrPunct.value = defaults.colors.punct;
   loadDefaults();
   bind();
 });
