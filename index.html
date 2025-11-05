@@ -11,63 +11,46 @@
   <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://power0matin.github.io/birthday-cake-generator/" />
 
-  <!-- ===== Color & Modes ===== 
-  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#111827" media="(prefers-color-scheme: dark)">
-  <meta name="color-scheme" content="light dark">
-  <meta name="format-detection" content="telephone=no">-->
+  <!-- Favicon (از آیکن جدید استفاده می‌کند) -->
+  <link rel="icon" type="image/png" sizes="512x512"
+    href="https://power0matin.github.io/birthday-cake-generator/images/birthday-cake.png" />
 
-  <!-- ===== Fonts (safe & simple) ===== -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
 
-  <!-- ===== CSS ===== -->
+  <!-- CSS -->
   <link rel="stylesheet" href="https://power0matin.github.io/birthday-cake-generator/style.css" />
 
-  <!-- ===== Vendor scripts (must load before app) ===== -->
+  <!-- Vendor scripts (قبل از اپ) -->
   <script defer src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
-  <!-- ===== App script (no module to avoid race with vendor globals) ===== -->
+  <!-- App script -->
   <script defer src="https://power0matin.github.io/birthday-cake-generator/main.js?v=3"></script>
 
-  <!--
-  ========================= Optional / Add Later =========================
-
-  1) Icons & Favicons 
-  <link rel="icon" type="image/svg+xml" href="https://power0matin.github.io/birthday-cake-generator/icons/favicon.svg">
-  <link rel="alternate icon" href="https://power0matin.github.io/birthday-cake-generator/favicon.ico">
-  <link rel="apple-touch-icon" sizes="180x180" href="https://power0matin.github.io/birthday-cake-generator/icons/apple-touch-icon.png">
-  <link rel="mask-icon" href="https://power0matin.github.io/birthday-cake-generator/icons/safari-pinned-tab.svg" color="#111827">
-  <meta name="msapplication-TileColor" content="#111827"> -->
-
+  <!-- Open Graph / Twitter (برای تلگرام و …) -->
   <meta property="og:site_name" content="Birthday Cake Poster" />
   <meta property="og:title" content="Birthday Cake Poster — A4 Landscape Generator" />
   <meta property="og:description"
     content="Design a stylish A4 cake poster. Customize colors, name, username & birthday, then export PNG or A4 PDF." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://power0matin.github.io/birthday-cake-generator/" />
-  <meta property="og:image" content="https://power0matin.github.io/birthday-cake-generator/og/cover.jpg" />
-  <meta property="og:image:secure_url" content="https://power0matin.github.io/birthday-cake-generator/og/cover.jpg" />
+  <meta property="og:image" content="https://power0matin.github.io/birthday-cake-generator/images/cover.jpg" />
+  <meta property="og:image:secure_url"
+    content="https://power0matin.github.io/birthday-cake-generator/images/cover.jpg" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:type" content="image/jpeg" />
   <meta property="og:image:alt" content="Preview of the A4 birthday cake poster" />
+
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Birthday Cake Poster — A4 Landscape Generator" />
-  <meta name="twitter:description" content="Design a stylish A4 cake poster with one-click exports." />
-  <meta name="twitter:image" content="https://power0matin.github.io/birthday-cake-generator/og/cover.jpg" />
-  <!--
-  3) PWA / Manifestccc
-  <link rel="manifest" href="https://power0matin.github.io/birthday-cake-generator/site.webmanifest">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  service worker را داخل main.js ثبت نکن؛ فایل sw.js جدا بساز
-  <script> if('serviceWorker' in navigator){ navigator.serviceWorker.register('/birthday-cake-generator/sw.js'); } </script>
-  
-  4) Structured Data (JSON-LD) — وقتی og/cover.jpg را آماده کردی فعال کن
-      -->
+  <meta name="twitter:description" content="Customize and export a beautiful A4 birthday cake poster." />
+  <meta name="twitter:image" content="https://power0matin.github.io/birthday-cake-generator/images/cover.jpg" />
+
+  <!-- Structured Data (JSON-LD) -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
@@ -77,41 +60,12 @@
     "description":"Create a personalized A4 landscape cake poster and export to PNG or PDF.",
     "applicationCategory":"DesignApplication",
     "operatingSystem":"Web",
-    "image":"https://power0matin.github.io/birthday-cake-generator/og/cover.jpg",
+    "image":"https://power0matin.github.io/birthday-cake-generator/images/cover.jpg",
     "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}
   }
   </script>
-
-  <!--5) Security: Subresource Integrity (SRI) برای CDNها
-
-  <script defer
-    src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"
-    integrity="sha384-PASTE_HASH_HERE"
-    crossorigin="anonymous"></script>
-  <script defer
-    src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"
-    integrity="sha384-PASTE_HASH_HERE"
-    crossorigin="anonymous"></script>
-  -->
-
-  <!-- 6) Analytics (مثلاً Google Analytics 4)
-
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXX');
-  </script>
-  -->
-
-  <!--7) Performance: Preload برای CSS (بعد از اطمینان از پایداری می‌توانی اضافه کنی)
-  
-  <link rel="preload" href="https://power0matin.github.io/birthday-cake-generator/style.css" as="style" fetchpriority="high">
-  -->
-
-
 </head>
+
 
 
 <body>
