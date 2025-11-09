@@ -447,4 +447,148 @@ window.addEventListener("DOMContentLoaded", () => {
   loadDefaults();
   bind();
   applyCustomLabels(); // set date label from data-date-label (optional)
+});asterizeSheet();
+  download(dataUrl, `${htmlCfg.filenamePrefix}-${Date.now()}.png`);
+}
+
+async function savePDF() {
+  const dataUrl = await rasterizeSheet();
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+  const pageW = pdf.internal.pageSize.getWidth();
+  const pageH = pdf.internal.pageSize.getHeight();
+  pdf.addImage(dataUrl, "PNG", 0, 0, pageW, pageH, undefined, "FAST");
+  pdf.save(`${htmlCfg.filenamePrefix}-${Date.now()}.pdf`);
+}
+
+// ---------- bindings (kept lightweight for your UI) ----------
+function bind() {
+  ["input", "change"].forEach((ev) => {
+    els.name?.addEventListener(ev, applyInputs);
+    els.username?.addEventListener(ev, applyInputs);
+    els.birthday?.addEventListener(ev, applyInputs);
+  });
+
+  [
+    els.clrBg, els.clrInk, els.clrKw, els.clrMod, els.clrFunc,
+    els.clrStr, els.clrNum, els.clrBorder, els.clrCodeBg, els.clrPunct,
+  ].forEach((el) => {
+    el?.addEventListener("input", applyThemeFromPickers);
+    el?.addEventListener("change", applyThemeFromPickers);
+  });
+
+  // Presets tuned to your CSS palette
+  if (els.presetWarm)
+    els.presetWarm.onclick = () =>
+      applyTheme({
+        bg: "#ffffff", ink: "#111111",
+        kw: "#ff5722", mod: "#6a1b9a", func: "#2e7d32", str: "#1565c0", num: "#d32f2f",
+        border: "#dfe3ea", codebg: "#fafafa", punct: "#444444",
+      });
+
+  if (els.presetCool)
+    els.presetCool.onclick = () =>
+      applyTheme({
+        bg: "#ffffff", ink: "#111111",
+        kw: "#00acc1", mod: "#3949ab", func: "#00897b", str: "#1976d2", num: "#e53935",
+        border: "#dfe3ea", codebg: "#f6f8fb", punct: "#3a3f47",
+      });
+
+  if (els.presetDark)
+    els.presetDark.onclick = () =>
+      applyTheme({
+        bg: "#121212", ink: "#f5f5f5",
+        kw: "#ff8a65", mod: "#ba68c8", func: "#81c784", str: "#64b5f6", num: "#ef5350",
+        border: "#333333", codebg: "#1e1e1e", punct: "#cccccc",
+      });
+
+  // Export actions
+  els.btnPNG && (els.btnPNG.onclick = savePNG);
+  els.btnPDF && (els.btnPDF.onclick = savePDF);
+  els.btnPrint && (els.btnPrint.onclick = () => window.print());
+
+  // Color actions
+  if (els.btnResetColors)
+    els.btnResetColors.onclick = () => {
+      setPickers(defaults.colors);
+      applyTheme(defaults.colors);
+    };
+
+  if (els.btnRandomColors)
+    els.btnRandomColors.onclick = () => {
+      const light = Math.random() > 0.5;
+      const palette = {
+        bg: light ? "#ffffff" : "#121212",
+        ink: light ? "#111111" : "#f5f5f5",
+        kw: randHex(), mod: randHex(), func: randHex(), str: randHex(), num: randHex(),
+        border: light ? "#dfe3ea" : "#333333",
+        codebg: light ? "#fafafa" : "#1e1e1e",
+        punct: light ? "#444444" : "#cccccc",
+      };
+      setPickers(palette);
+      applyTheme(palette);
+    };
+
+  if (els.btnSaveTheme)
+    els.btnSaveTheme.onclick = () => {
+      const c = getPickerColors();
+      saveTheme(c);
+      els.btnSaveTheme.textContent = "Saved ✓";
+      setTimeout(() => (els.btnSaveTheme.textContent = "Save"), 900);
+    };
+
+  if (els.btnLoadTheme)
+    els.btnLoadTheme.onclick = () => {
+      const c = loadTheme();
+      if (c) { setPickers(c); applyTheme(c); }
+      else {
+        els.btnLoadTheme.textContent = "No Theme";
+        setTimeout(() => (els.btnLoadTheme.textContent = "Load"), 900);
+      }
+    };
+
+  if (els.btnCopyCSS)
+    els.btnCopyCSS.onclick = async () => {
+      const colors = getPickerColors();
+      const css = `:root{
+  --bg:${colors.bg}; --ink:${colors.ink}; --kw:${colors.kw}; --mod:${colors.mod};
+  --func:${colors.func}; --str:${colors.str}; --num:${colors.num}; --border:${colors.border};
+  --codebg:${colors.codebg}; --punct:${colors.punct};
+}`;
+      await navigator.clipboard?.writeText(css);
+      els.btnCopyCSS.textContent = "Copied ✓";
+      setTimeout(() => (els.btnCopyCSS.textContent = "Copy CSS"), 900);
+    };
+
+  if (els.btnExportTheme)
+    els.btnExportTheme.onclick = () => {
+      const blob = new Blob([JSON.stringify(getPickerColors(), null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "theme.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+
+  if (els.btnImportTheme)
+    els.btnImportTheme.onclick = () => els.inpImportTheme?.click();
+
+  if (els.inpImportTheme)
+    els.inpImportTheme.onchange = async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      try {
+        const c = JSON.parse(await file.text());
+        setPickers(c); applyTheme(c);
+      } catch { alert("Invalid theme file."); }
+      finally { e.target.value = ""; }
+    };
+}
+
+// ---------- boot ----------
+window.addEventListener("DOMContentLoaded", () => {
+  loadDefaults();
+  bind();
+  applyCustomLabels(); // set date label from data-date-label (optional)
 });
