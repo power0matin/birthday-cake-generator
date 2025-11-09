@@ -2,47 +2,87 @@ name: Refresh live screenshot
 
 on:
   schedule:
-    - cron: "*/15 * * * *" # هر ۱۵ دقیقه
-  workflow_dispatch: {}     # امکان اجرا دستی
+    - cron: "*/15 * * * *"   # ⬅️ بازه‌ی اجرا (هر ۱۵ دقیقه). اگر بخواهی کم/زیاد کن.
+  workflow_dispatch: {}       # اجرا دستی از تب Actions
   push:
     paths:
       - ".github/workflows/refresh-screenshot.yml"
 
+# از هم‌پوشانی ران‌ها جلوگیری می‌کند
+concurrency:
+  group: refresh-screenshot-${{ github.ref }}
+  cancel-in-progress: true
+
+# برای اینکه بتواند به ریپو push کند
+permissions:
+  contents: write
+
 jobs:
   shot:
     runs-on: ubuntu-latest
+
+    # ✅ تنظیمات قابل شخصی‌سازی در یک‌جا
+    env:
+      # ⬅️ آدرس صفحه‌ای که باید اسکرین‌شات بگیری
+      TARGET_URL: "https://power0matin.github.io/birthday-cake-generator/"
+      # ⬅️ مسیر خروجی تصویر داخل ریپو (بعداً در README به این اشاره می‌کنی)
+      OUTPUT_PATH: "assets/birthday-cake-preview.png"
+      # ⬅️ پارامترهای thum.io (viewport و کراپ)
+      THUM_WIDTH: "900"
+      THUM_CROP: "900x560"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Make assets dir if missing
-        run: mkdir -p assets
+      - name: Ensure assets dir exists
+        run: mkdir -p "$(dirname "$OUTPUT_PATH")"
 
+      # تلاش اول: thum.io
       - name: Try thum.io
         id: thum
+        shell: bash
         run: |
           set -e
-          curl -fsSL \
-            "https://image.thum.io/get/width/900/crop/900x560/noanimate/https://power0matin.github.io/iran-provinces/" \
-            -o assets/preview.png
+          curl -fSL \
+            "https://image.thum.io/get/width/${THUM_WIDTH}/crop/${THUM_CROP}/noanimate/${TARGET_URL}" \
+            -H "User-Agent: github-actions-screenshot" \
+            -o "$OUTPUT_PATH"
+          # سایز معقول برای اطمینان از تصویر واقعی
+          BYTES=$(wc -c < "$OUTPUT_PATH" | tr -d ' ')
+          if [ "$BYTES" -lt 5000 ]; then
+            echo "Downloaded file too small ($BYTES bytes) — likely invalid."
+            exit 2
+          fi
           echo "ok=true" >> $GITHUB_OUTPUT
         continue-on-error: true
 
-      - name: Fallback to Microlink if thum.io failed
+      # تلاش دوم: Microlink اگر thum.io خطا داد یا فایل کوچک بود
+      - name: Fallback to Microlink
         if: steps.thum.outputs.ok != 'true'
+        shell: bash
         run: |
-          curl -fsSL \
-            "https://i.microlink.io/https://power0matin.github.io/iran-provinces/?screenshot=true" \
-            -o assets/preview.png
+          set -e
+          curl -fSL \
+            "https://i.microlink.io/${TARGET_URL}?screenshot=true" \
+            -H "User-Agent: github-actions-screenshot" \
+            -o "$OUTPUT_PATH"
+          BYTES=$(wc -c < "$OUTPUT_PATH" | tr -d ' ')
+          if [ "$BYTES" -lt 5000 ]; then
+            echo "Fallback image also too small ($BYTES bytes)."
+            exit 1
+          fi
 
+      # فقط وقتی واقعاً تغییر کرده، کامیت کن
       - name: Commit only if changed
+        shell: bash
         run: |
-          if git diff --quiet -- assets/preview.png; then
+          if git diff --quiet -- "$OUTPUT_PATH"; then
             echo "No changes to commit."
             exit 0
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/preview.png
+          git config --global user.name  "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$OUTPUT_PATH"
           git commit -m "chore: refresh live screenshot"
           git push
