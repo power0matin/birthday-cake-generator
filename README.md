@@ -8,6 +8,11 @@ With this project you can edit your **name**, **username**, **birthday**, and **
 
 
 ## 🌐 Live Demo
+<p align="center">
+  <a href="https://power0matin.github.io/iran-provinces/">
+    <img alt="Preview of Iran-Provinces project" src="./assets/preview.png" width="900">
+  </a>
+</p>
 👉 [https://power0matin.github.io/birthday-cake-generator/](https://power0matin.github.io/birthday-cake-generator/)
 
 
