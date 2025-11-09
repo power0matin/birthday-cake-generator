@@ -152,32 +152,32 @@
         </div>
 
         <div class="code-card">
-          <pre id="code">
+<pre id="code">
 <span class="kw">from</span> <span class="mod">datetime</span> <span class="kw">import</span> <span class="mod">date</span>
-<span class="mod">today</span> <span class="kw">=</span> <span class="mod">date</span>.<span class="func">today</span>()
+<span class="mod">امروز</span> <span class="kw">=</span> <span class="mod">date</span>.<span class="func">today</span>()
 
-<span class="mod">name</span> <span class="kw">=</span> <span class="str">"Your Name"</span>
-<span class="mod">username</span> <span class="kw">=</span> <span class="str">"@username"</span>
+<span class="mod">نام</span> <span class="kw">=</span> <span class="str">"نام شما"</span>
+<span class="mod">یوزرنیم</span> <span class="kw">=</span> <span class="str">"@username"</span>
 
-<span class="mod">exam_day</span> <span class="kw">=</span> <span class="mod">date</span>(<span class="num">2026</span>, <span class="num">6</span>, <span class="num">30</span>)
-<span class="mod">days_left</span> <span class="kw">=</span> (<span class="mod">exam_day</span> <span class="kw">-</span> <span class="mod">today</span>).<span class="func">days</span>
+<span class="mod">روز_آزمون</span> <span class="kw">=</span> <span class="mod">date</span>(<span class="num">2026</span>, <span class="num">6</span>, <span class="num">30</span>)
+<span class="mod">روزهای_باقی‌مانده</span> <span class="kw">=</span> (<span class="mod">روز_آزمون</span> <span class="kw">-</span> <span class="mod">امروز</span>).<span class="func">days</span>
 
-<span class="kw">if</span> <span class="mod">days_left</span> <span class="kw">&lt;=</span> <span class="num">0</span><span class="kw">:</span>
-    <span class="func">print</span>(<span class="str">"🚀 Exam day: breathe, focus, execute."</span>)
-<span class="kw">elif</span> <span class="mod">today</span>.<span class="func">weekday</span>() <span class="kw">in</span> (<span class="num">5</span>, <span class="num">6</span>)<span class="kw">:</span>
-    <span class="func">print</span>(<span class="str">"🌿 Weekend boost — review &amp; recharge."</span>)
-    <span class="func">review</span>()
-    <span class="func">recharge</span>()
-<span class="kw">else</span><span class="kw">:</span>
-    <span class="func">print</span>(<span class="str">"📚 Trust the process — one question at a time."</span>)
-    <span class="func">study</span>(<span class="mod">hours</span><span class="kw">=</span><span class="num">6</span>)
-    <span class="func">practice</span>(<span class="mod">questions</span><span class="kw">=</span><span class="num">30</span>)
-    <span class="func">review</span>()
+<span class="kw">اگر</span> <span class="mod">روزهای_باقی‌مانده</span> <span class="kw">&lt;=</span> <span class="num">0</span><span class="kw">:</span>
+    <span class="func">print</span>(<span class="str">"🚀 روز آزمون: نفس عمیق، تمرکز، اجرا."</span>)
+<span class="kw">وگرنه_اگر</span> <span class="mod">امروز</span>.<span class="func">weekday</span>() <span class="kw">in</span> (<span class="num">5</span>, <span class="num">6</span>)<span class="kw">:</span>
+    <span class="func">print</span>(<span class="str">"🌿 آخر هفته — مرور کن و انرژی بگیر."</span>)
+    <span class="func">مرور</span>()
+    <span class="func">استراحت</span>()
+<span class="kw">در_غیر_این_صورت</span><span class="kw">:</span>
+    <span class="func">print</span>(<span class="str">"📚 به روندت اعتماد کن — هر بار یک سؤال."</span>)
+    <span class="func">مطالعه</span>(<span class="mod">ساعت</span><span class="kw">=</span><span class="num">6</span>)
+    <span class="func">تمرین</span>(<span class="mod">سؤال</span><span class="kw">=</span><span class="num">30</span>)
+    <span class="func">مرور</span>()
 
-<span class="kw">if</span> <span class="mod">days_left</span> <span class="kw">&gt;</span> <span class="num">0</span><span class="kw">:</span>
-    <span class="func">print</span>(<span class="str">f"🎯 {{days_left}} days to go — keep going!"</span>)
+<span class="kw">اگر</span> <span class="mod">روزهای_باقی‌مانده</span> <span class="kw">&gt;</span> <span class="num">0</span><span class="kw">:</span>
+    <span class="func">print</span>(<span class="str">f"🎯 {روزهای_باقی‌مانده} روز تا آزمون — ادامه بده!"</span>)
 
-<span class="func">print</span>(<span class="str">"🔥 Your effort today = your success tomorrow."</span>)
+<span class="func">print</span>(<span class="str">"🔥 تلاش امروزت = موفقیت فردایت."</span>)
 </pre>
         </div>
 
