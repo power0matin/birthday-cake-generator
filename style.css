@@ -1,4 +1,9 @@
-/* --- Print: centered A4 landscape with safe margin --- */
+/* ==========================================================================
+   A4 Landscape Poster UI — Optimized for screen & export (PNG/PDF/Print)
+   Works with index.html (birthday) and school.html (exam)
+   ========================================================================== */
+
+/* --- PRINT: A4 landscape, centered, with safe inner margins --- */
 @page {
   size: A4 landscape;
   margin: 0;
@@ -40,9 +45,9 @@
     width: calc(297mm - 2 * var(--print-margin)) !important;
     height: calc(210mm - 2 * var(--print-margin)) !important;
     margin: 0 !important;
-    padding: 10mm !important;
-    box-shadow: none !important;
+    padding: 8mm !important;
     border-radius: 4mm !important;
+    box-shadow: none !important;
     page-break-before: avoid !important;
     page-break-after: avoid !important;
     break-inside: avoid !important;
@@ -50,18 +55,58 @@
 
   .code-card {
     overflow: hidden !important;
-    box-shadow: none !important;
+    /* اسکرول نباشد */
+    padding: 8mm !important;
+    break-inside: avoid !important;
+  }
+
+  .code-card pre {
+    white-space: pre-wrap !important;
+    /* خطوط بشکند */
+    display: block !important;
+    overflow: visible !important;
+    max-height: none !important;
+    /* اندازهٔ فونت در پرینت را JS تطبیقی می‌کند */
   }
 
   * {
-    break-inside: avoid;
+    break-inside: auto !important;
   }
 }
 
+/* ========== Export-only (html.exporting روی <html>) ========== */
+html.exporting .panel {
+  display: none !important;
+}
 
-/* --- Design tokens --- */
+html.exporting .sheet {
+  box-shadow: none !important;
+}
+
+html.exporting .code-card {
+  overflow: hidden !important;
+  /* بدون اسکرول‌بار در PNG/PDF */
+  padding-right: 8mm;
+}
+
+html.exporting .code-card::-webkit-scrollbar {
+  display: none !important;
+}
+
+html.exporting .code-card {
+  scrollbar-width: none !important;
+}
+
+html.exporting .code-card pre {
+  white-space: pre-wrap !important;
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+/* ==========================================================================
+   Design tokens
+   ========================================================================== */
 :root {
-  /* Poster (scoped to #sheet via JS) */
   --bg: #ffffff;
   --ink: #111111;
   --kw: #ff5722;
@@ -74,40 +119,35 @@
   --codebg: #fafafa;
   --punct: #444444;
 
-  /* App surfaces (non-sheet) */
   --app-bg: #eef1f5;
   --surface: #f7f8fb;
   --surface-2: #ffffff;
 
-  /* Buttons */
   --btn: #2e7d32;
-  /* primary */
   --btn-text: #ffffff;
   --btn-border: #cfd6e3;
   --btn-neutral: #f0f3f8;
 
-  /* Focus & misc */
-  --focus: rgba(46, 125, 50, 0.25);
+  --focus: rgba(46, 125, 50, .25);
 
-  /* Radii / spacing */
   --radius-lg: 12px;
   --radius-md: 10px;
   --radius-sm: 8px;
   --gap: 16px;
   --gap-sm: 8px;
 
-  /* Backward-compat */
   --panel-bg: var(--surface);
   --panel-border: #d9dde6;
   --card-bg: var(--surface-2);
 }
 
-/* --- Global --- */
+/* ==========================================================================
+   Global & Layout
+   ========================================================================== */
 * {
   box-sizing: border-box;
 }
 
-/* --- Global (adjust background) --- */
 html,
 body {
   height: 100%;
@@ -124,7 +164,6 @@ body {
   color: #111;
 }
 
-/* --- Layout --- */
 .app {
   display: grid;
   grid-template-columns: minmax(360px, 420px) 1fr;
@@ -133,7 +172,6 @@ body {
   padding: var(--gap);
 }
 
-/* --- Panel: clearer separation --- */
 .panel {
   background: var(--surface);
   border: 1px solid var(--panel-border);
@@ -144,25 +182,6 @@ body {
   gap: 12px;
   position: relative;
   box-shadow: 0 10px 25px rgba(17, 24, 39, .06);
-}
-
-.panel details[open] {
-  background: var(--surface-2);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
-  border: 1px solid #ccd3de;
-}
-
-.panel details summary {
-  cursor: pointer;
-  font-weight: 600;
-  color: #333;
-  list-style: none;
-  outline: none;
-  margin-bottom: 6px;
-}
-
-.panel details summary::-webkit-details-marker {
-  display: none;
 }
 
 .panel h1 {
@@ -184,7 +203,6 @@ body {
   font-family: inherit;
   background: #fff;
   color: var(--ink);
-  outline: none;
 }
 
 .panel input[type="text"]:focus,
@@ -193,7 +211,6 @@ body {
   box-shadow: 0 0 0 4px var(--focus);
 }
 
-/* Buttons: neutral vs primary */
 .panel button {
   padding: 10px 12px;
   border: 1px solid var(--btn-border);
@@ -217,12 +234,40 @@ body {
   border: 1px dashed #d9dde6;
   border-radius: var(--radius-md);
   padding: 10px;
-  transition: all 0.2s ease;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  transition: all .2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .03);
 }
 
-/* Make bottom action buttons primary (Save/Export/Print) */
+.panel details[open] {
+  background: var(--surface-2);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .05);
+  border: 1px solid #ccd3de;
+}
+
+.panel details summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #333;
+  list-style: none;
+  outline: none;
+  margin-bottom: 6px;
+}
+
+.panel details summary::-webkit-details-marker {
+  display: none;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.stick-bottom {
+  margin-top: auto;
+}
+
 .row.stick-bottom button {
   background: var(--btn);
   color: var(--btn-text);
@@ -235,17 +280,12 @@ body {
   box-shadow: 0 10px 22px rgba(46, 125, 50, .22);
 }
 
-.row.stick-bottom button:active {
-  transform: translateY(1px);
-}
-
 .grid.colors {
   margin-top: 10px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
   max-height: 260px;
-  /* prevents overflow */
   overflow-y: auto;
   padding-right: 4px;
 }
@@ -259,7 +299,6 @@ body {
   border-radius: 4px;
 }
 
-/* Details of color grid look like cards */
 .grid.colors label {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -269,7 +308,11 @@ body {
   border-radius: 8px;
   background: var(--surface);
   border: 1px solid #e1e6ee;
-  transition: background 0.2s ease;
+  transition: background .2s ease;
+}
+
+.grid.colors label:hover {
+  background: #eef1f5;
 }
 
 .grid.colors input[type="color"] {
@@ -281,38 +324,17 @@ body {
   background: #fff;
 }
 
-.grid.colors label:hover {
-  background: #eef1f5;
-}
-
-.row {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.stick-bottom {
-  margin-top: auto;
-}
-
-.hint {
-  color: #666;
-  font-size: 12px;
-  margin: 8px 0 0;
-}
-
-/* Stage */
 .stage-wrap {
   display: grid;
   place-items: center;
   overflow: auto;
+  min-height: 0;
 }
 
-/* --- Poster (A4 exact) --- */
+/* ========================================================================== */
 .sheet {
   width: 277mm;
   height: 190mm;
-  /* A4 landscape with inner margin */
   border: .6mm solid var(--border);
   border-radius: 5mm;
   padding: 12mm;
@@ -322,6 +344,7 @@ body {
   justify-content: space-between;
   gap: 1mm;
   box-shadow: 0 10px 30px rgba(0, 0, 0, .06);
+  color: var(--ink);
 }
 
 .header {
@@ -352,28 +375,25 @@ body {
   flex-grow: 1;
   border: .5mm solid var(--border);
   border-radius: 4mm;
-  background: var(--card-bg);
   background: var(--codebg);
   padding: 10mm;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
+  overflow: auto;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-height: 0;
 }
 
-.sheet {
-  color: var(--ink);
-}
-
+/* Code text */
 pre {
   margin: 0;
   font-size: 4.3mm;
   line-height: 1.4;
-  color: var(--ink);
-  /* به‌جای accent */
+  color: var(--punct);
   white-space: pre;
-  overflow: auto;
   max-width: 100%;
+  overflow: visible;
+  max-height: none;
 }
 
 .sheet .kw {
@@ -401,18 +421,10 @@ pre {
   font-weight: 800;
 }
 
-.sheet .brand .tag {
-  color: var(--ink);
-}
-
+.sheet .brand .tag,
 .sheet .username {
   color: var(--ink);
 }
-
-.sheet pre {
-  color: var(--punct);
-}
-
 
 /* Footer */
 .footer {
@@ -430,8 +442,10 @@ pre {
   border-radius: 3mm;
 }
 
-/* --- Responsive --- */
-@media (max-width: 980px) {
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width:980px) {
   .app {
     grid-template-columns: 1fr;
     height: auto;
@@ -449,10 +463,9 @@ pre {
   pre {
     font-size: 4.6mm;
   }
-
 }
 
-@media (max-width: 560px) {
+@media (max-width:560px) {
   pre {
     font-size: 4.2mm;
   }
@@ -462,301 +475,14 @@ pre {
   }
 }
 
+/* Small tweaks */
+.color-actions {
+  margin-top: 10px;
+  gap: 6px;
+}
+
 .color-actions button {
   font-size: 12px;
   padding: 8px 10px;
   border-radius: 8px;
 }
-
-.color-actions {
-  margin-top: 10px;
-  gap: 6px;
-}asterizeSheet();
-  download(dataUrl, `${htmlCfg.filenamePrefix}-${Date.now()}.png`);
-}
-
-async function savePDF() {
-  const dataUrl = await rasterizeSheet();
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-  const pageW = pdf.internal.pageSize.getWidth();
-  const pageH = pdf.internal.pageSize.getHeight();
-  pdf.addImage(dataUrl, "PNG", 0, 0, pageW, pageH, undefined, "FAST");
-  pdf.save(`${htmlCfg.filenamePrefix}-${Date.now()}.pdf`);
-}
-
-// ---------- bindings (kept lightweight for your UI) ----------
-function bind() {
-  ["input", "change"].forEach((ev) => {
-    els.name?.addEventListener(ev, applyInputs);
-    els.username?.addEventListener(ev, applyInputs);
-    els.birthday?.addEventListener(ev, applyInputs);
-  });
-
-  [
-    els.clrBg, els.clrInk, els.clrKw, els.clrMod, els.clrFunc,
-    els.clrStr, els.clrNum, els.clrBorder, els.clrCodeBg, els.clrPunct,
-  ].forEach((el) => {
-    el?.addEventListener("input", applyThemeFromPickers);
-    el?.addEventListener("change", applyThemeFromPickers);
-  });
-
-  // Presets tuned to your CSS palette
-  if (els.presetWarm)
-    els.presetWarm.onclick = () =>
-      applyTheme({
-        bg: "#ffffff", ink: "#111111",
-        kw: "#ff5722", mod: "#6a1b9a", func: "#2e7d32", str: "#1565c0", num: "#d32f2f",
-        border: "#dfe3ea", codebg: "#fafafa", punct: "#444444",
-      });
-
-  if (els.presetCool)
-    els.presetCool.onclick = () =>
-      applyTheme({
-        bg: "#ffffff", ink: "#111111",
-        kw: "#00acc1", mod: "#3949ab", func: "#00897b", str: "#1976d2", num: "#e53935",
-        border: "#dfe3ea", codebg: "#f6f8fb", punct: "#3a3f47",
-      });
-
-  if (els.presetDark)
-    els.presetDark.onclick = () =>
-      applyTheme({
-        bg: "#121212", ink: "#f5f5f5",
-        kw: "#ff8a65", mod: "#ba68c8", func: "#81c784", str: "#64b5f6", num: "#ef5350",
-        border: "#333333", codebg: "#1e1e1e", punct: "#cccccc",
-      });
-
-  // Export actions
-  els.btnPNG && (els.btnPNG.onclick = savePNG);
-  els.btnPDF && (els.btnPDF.onclick = savePDF);
-  els.btnPrint && (els.btnPrint.onclick = () => window.print());
-
-  // Color actions
-  if (els.btnResetColors)
-    els.btnResetColors.onclick = () => {
-      setPickers(defaults.colors);
-      applyTheme(defaults.colors);
-    };
-
-  if (els.btnRandomColors)
-    els.btnRandomColors.onclick = () => {
-      const light = Math.random() > 0.5;
-      const palette = {
-        bg: light ? "#ffffff" : "#121212",
-        ink: light ? "#111111" : "#f5f5f5",
-        kw: randHex(), mod: randHex(), func: randHex(), str: randHex(), num: randHex(),
-        border: light ? "#dfe3ea" : "#333333",
-        codebg: light ? "#fafafa" : "#1e1e1e",
-        punct: light ? "#444444" : "#cccccc",
-      };
-      setPickers(palette);
-      applyTheme(palette);
-    };
-
-  if (els.btnSaveTheme)
-    els.btnSaveTheme.onclick = () => {
-      const c = getPickerColors();
-      saveTheme(c);
-      els.btnSaveTheme.textContent = "Saved ✓";
-      setTimeout(() => (els.btnSaveTheme.textContent = "Save"), 900);
-    };
-
-  if (els.btnLoadTheme)
-    els.btnLoadTheme.onclick = () => {
-      const c = loadTheme();
-      if (c) { setPickers(c); applyTheme(c); }
-      else {
-        els.btnLoadTheme.textContent = "No Theme";
-        setTimeout(() => (els.btnLoadTheme.textContent = "Load"), 900);
-      }
-    };
-
-  if (els.btnCopyCSS)
-    els.btnCopyCSS.onclick = async () => {
-      const colors = getPickerColors();
-      const css = `:root{
-  --bg:${colors.bg}; --ink:${colors.ink}; --kw:${colors.kw}; --mod:${colors.mod};
-  --func:${colors.func}; --str:${colors.str}; --num:${colors.num}; --border:${colors.border};
-  --codebg:${colors.codebg}; --punct:${colors.punct};
-}`;
-      await navigator.clipboard?.writeText(css);
-      els.btnCopyCSS.textContent = "Copied ✓";
-      setTimeout(() => (els.btnCopyCSS.textContent = "Copy CSS"), 900);
-    };
-
-  if (els.btnExportTheme)
-    els.btnExportTheme.onclick = () => {
-      const blob = new Blob([JSON.stringify(getPickerColors(), null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "theme.json";
-      a.click();
-      URL.revokeObjectURL(url);
-    };
-
-  if (els.btnImportTheme)
-    els.btnImportTheme.onclick = () => els.inpImportTheme?.click();
-
-  if (els.inpImportTheme)
-    els.inpImportTheme.onchange = async (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      try {
-        const c = JSON.parse(await file.text());
-        setPickers(c); applyTheme(c);
-      } catch { alert("Invalid theme file."); }
-      finally { e.target.value = ""; }
-    };
-}
-
-// ---------- boot ----------
-window.addEventListener("DOMContentLoaded", () => {
-  loadDefaults();
-  bind();
-  applyCustomLabels(); // set date label from data-date-label (optional)
-});asterizeSheet();
-  download(dataUrl, `${htmlCfg.filenamePrefix}-${Date.now()}.png`);
-}
-
-async function savePDF() {
-  const dataUrl = await rasterizeSheet();
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-  const pageW = pdf.internal.pageSize.getWidth();
-  const pageH = pdf.internal.pageSize.getHeight();
-  pdf.addImage(dataUrl, "PNG", 0, 0, pageW, pageH, undefined, "FAST");
-  pdf.save(`${htmlCfg.filenamePrefix}-${Date.now()}.pdf`);
-}
-
-// ---------- bindings (kept lightweight for your UI) ----------
-function bind() {
-  ["input", "change"].forEach((ev) => {
-    els.name?.addEventListener(ev, applyInputs);
-    els.username?.addEventListener(ev, applyInputs);
-    els.birthday?.addEventListener(ev, applyInputs);
-  });
-
-  [
-    els.clrBg, els.clrInk, els.clrKw, els.clrMod, els.clrFunc,
-    els.clrStr, els.clrNum, els.clrBorder, els.clrCodeBg, els.clrPunct,
-  ].forEach((el) => {
-    el?.addEventListener("input", applyThemeFromPickers);
-    el?.addEventListener("change", applyThemeFromPickers);
-  });
-
-  // Presets tuned to your CSS palette
-  if (els.presetWarm)
-    els.presetWarm.onclick = () =>
-      applyTheme({
-        bg: "#ffffff", ink: "#111111",
-        kw: "#ff5722", mod: "#6a1b9a", func: "#2e7d32", str: "#1565c0", num: "#d32f2f",
-        border: "#dfe3ea", codebg: "#fafafa", punct: "#444444",
-      });
-
-  if (els.presetCool)
-    els.presetCool.onclick = () =>
-      applyTheme({
-        bg: "#ffffff", ink: "#111111",
-        kw: "#00acc1", mod: "#3949ab", func: "#00897b", str: "#1976d2", num: "#e53935",
-        border: "#dfe3ea", codebg: "#f6f8fb", punct: "#3a3f47",
-      });
-
-  if (els.presetDark)
-    els.presetDark.onclick = () =>
-      applyTheme({
-        bg: "#121212", ink: "#f5f5f5",
-        kw: "#ff8a65", mod: "#ba68c8", func: "#81c784", str: "#64b5f6", num: "#ef5350",
-        border: "#333333", codebg: "#1e1e1e", punct: "#cccccc",
-      });
-
-  // Export actions
-  els.btnPNG && (els.btnPNG.onclick = savePNG);
-  els.btnPDF && (els.btnPDF.onclick = savePDF);
-  els.btnPrint && (els.btnPrint.onclick = () => window.print());
-
-  // Color actions
-  if (els.btnResetColors)
-    els.btnResetColors.onclick = () => {
-      setPickers(defaults.colors);
-      applyTheme(defaults.colors);
-    };
-
-  if (els.btnRandomColors)
-    els.btnRandomColors.onclick = () => {
-      const light = Math.random() > 0.5;
-      const palette = {
-        bg: light ? "#ffffff" : "#121212",
-        ink: light ? "#111111" : "#f5f5f5",
-        kw: randHex(), mod: randHex(), func: randHex(), str: randHex(), num: randHex(),
-        border: light ? "#dfe3ea" : "#333333",
-        codebg: light ? "#fafafa" : "#1e1e1e",
-        punct: light ? "#444444" : "#cccccc",
-      };
-      setPickers(palette);
-      applyTheme(palette);
-    };
-
-  if (els.btnSaveTheme)
-    els.btnSaveTheme.onclick = () => {
-      const c = getPickerColors();
-      saveTheme(c);
-      els.btnSaveTheme.textContent = "Saved ✓";
-      setTimeout(() => (els.btnSaveTheme.textContent = "Save"), 900);
-    };
-
-  if (els.btnLoadTheme)
-    els.btnLoadTheme.onclick = () => {
-      const c = loadTheme();
-      if (c) { setPickers(c); applyTheme(c); }
-      else {
-        els.btnLoadTheme.textContent = "No Theme";
-        setTimeout(() => (els.btnLoadTheme.textContent = "Load"), 900);
-      }
-    };
-
-  if (els.btnCopyCSS)
-    els.btnCopyCSS.onclick = async () => {
-      const colors = getPickerColors();
-      const css = `:root{
-  --bg:${colors.bg}; --ink:${colors.ink}; --kw:${colors.kw}; --mod:${colors.mod};
-  --func:${colors.func}; --str:${colors.str}; --num:${colors.num}; --border:${colors.border};
-  --codebg:${colors.codebg}; --punct:${colors.punct};
-}`;
-      await navigator.clipboard?.writeText(css);
-      els.btnCopyCSS.textContent = "Copied ✓";
-      setTimeout(() => (els.btnCopyCSS.textContent = "Copy CSS"), 900);
-    };
-
-  if (els.btnExportTheme)
-    els.btnExportTheme.onclick = () => {
-      const blob = new Blob([JSON.stringify(getPickerColors(), null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "theme.json";
-      a.click();
-      URL.revokeObjectURL(url);
-    };
-
-  if (els.btnImportTheme)
-    els.btnImportTheme.onclick = () => els.inpImportTheme?.click();
-
-  if (els.inpImportTheme)
-    els.inpImportTheme.onchange = async (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      try {
-        const c = JSON.parse(await file.text());
-        setPickers(c); applyTheme(c);
-      } catch { alert("Invalid theme file."); }
-      finally { e.target.value = ""; }
-    };
-}
-
-// ---------- boot ----------
-window.addEventListener("DOMContentLoaded", () => {
-  loadDefaults();
-  bind();
-  applyCustomLabels(); // set date label from data-date-label (optional)
-});
