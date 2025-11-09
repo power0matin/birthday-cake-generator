@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- ===== Essentials ===== -->
+  <meta charset="utf-8" />
+  <title>Birthday Cake Poster — A4 Landscape Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description"
+    content="طراحی پوستر کیک تولد سایز A4 (افقی) با شخصی‌سازی نام، یوزرنیم و رنگ‌ها؛ خروجی سریع PNG و PDF." />
+  <meta name="robots" content="index,follow" />
+  <link rel="canonical" href="https://power0matin.github.io/birthday-cake-generator/" />
+
+  <!-- Favicon (از آیکن جدید استفاده می‌کند) -->
+  <link rel="icon" type="image/png" sizes="512x512"
+    href="https://power0matin.github.io/birthday-cake-generator/images/birthday-cake.png" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="https://power0matin.github.io/birthday-cake-generator/style.css" />
+
+  <!-- Vendor scripts (قبل از اپ) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <!-- App script -->
+  <script defer src="https://power0matin.github.io/birthday-cake-generator/main.js?v=3"></script>
+
+  <!-- Open Graph / Twitter (برای تلگرام و …) -->
+  <meta property="og:site_name" content="Birthday Cake Poster" />
+  <meta property="og:title" content="Birthday Cake Poster — A4 Landscape Generator" />
+  <meta property="og:description"
+    content="Design a stylish A4 cake poster. Customize colors, name, username & birthday, then export PNG or A4 PDF." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://power0matin.github.io/birthday-cake-generator/" />
+  <meta property="og:image" content="https://power0matin.github.io/birthday-cake-generator/images/cover.jpg" />
+  <meta property="og:image:secure_url"
+    content="https://power0matin.github.io/birthday-cake-generator/images/cover.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:alt" content="Preview of the A4 birthday cake poster" />
+
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Birthday Cake Poster — A4 Landscape Generator" />
+  <meta name="twitter:description" content="Customize and export a beautiful A4 birthday cake poster." />
+  <meta name="twitter:image" content="https://power0matin.github.io/birthday-cake-generator/images/cover.jpg" />
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebApplication",
+    "name":"Birthday Cake Poster — A4 Landscape Generator",
+    "url":"https://power0matin.github.io/birthday-cake-generator/",
+    "description":"Create a personalized A4 landscape cake poster and export to PNG or PDF.",
+    "applicationCategory":"DesignApplication",
+    "operatingSystem":"Web",
+    "image":"https://power0matin.github.io/birthday-cake-generator/images/cover.jpg",
+    "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}
+  }
+  </script>
+</head>
+
+
+
+<body>
+  <div class="app">
+    <aside class="panel">
+      <h1>Settings</h1>
+
+      <label>
+        Name
+        <input id="inp-name" type="text" placeholder="e.g. John Doe" />
+      </label>
+      <label>
+        Username
+        <input id="inp-username" type="text" placeholder="e.g. @johndoe" />
+      </label>
+      <label>
+        Birthday
+        <input id="inp-birthday" type="date" />
+      </label>
+
+      <div class="row">
+        <button id="preset-warm">Warm Palette</button>
+        <button id="preset-cool">Cool Palette</button>
+        <button id="preset-dark">Dark Mode</button>
+      </div>
+
+      <details>
+        <summary>Custom Colors</summary>
+
+        <div class="grid colors">
+          <label>Background <input id="clr-bg" type="color"></label>
+          <label>Text <input id="clr-ink" type="color"></label>
+          <label>Keyword <input id="clr-kw" type="color"></label>
+          <label>Module <input id="clr-mod" type="color"></label>
+          <label>Function <input id="clr-func" type="color"></label>
+          <label>String <input id="clr-str" type="color"></label>
+          <label>Number <input id="clr-num" type="color"></label>
+          <label>Border <input id="clr-border" type="color"></label>
+          <label>Code Background <input id="clr-codebg" type="color"></label>
+          <label>Punctuation <input id="clr-punct" type="color"></label>
+        </div>
+
+
+        <div class="row color-actions">
+          <button id="btn-reset-colors" title="Reset to defaults">Reset</button>
+          <button id="btn-random-colors" title="Generate random palette">Random</button>
+          <button id="btn-save-theme" title="Save to your browser">Save</button>
+          <button id="btn-load-theme" title="Load from your browser">Load</button>
+          <button id="btn-copy-css" title="Copy CSS variables">Copy CSS</button>
+          <button id="btn-export-theme" title="Export JSON">Export</button>
+          <button id="btn-import-theme" title="Import JSON">Import</button>
+          <input id="inp-import-theme" type="file" accept="application/json" hidden>
+        </div>
+      </details>
+
+
+      <div class="row stick-bottom">
+        <button id="btn-png">Save PNG</button>
+        <button id="btn-pdf">Save PDF (A4)</button>
+        <button id="btn-print">Print</button>
+      </div>
+
+      <p class="hint">PNG output is recommended for cake printing. The size is A4 landscape.</p>
+    </aside>
+
+    <main class="stage-wrap">
+      <section id="sheet" class="sheet" role="img" aria-label="A4 Cake Poster">
+        <div class="header">
+          <div class="brand">
+            <div class="tag" id="out-name">Your&nbsp;Name</div>
+          </div>
+          <div class="icons">
+            <svg class="icon" viewBox="0 0 16 16" aria-label="GitHub">
+              <path fill="#000"
+                d="M8 0C3.58 0 0 3.73 0 8.33c0 3.68 2.29 6.79 5.47 7.89.4.08.55-.18.55-.39 0-.19-.01-.82-.01-1.49-2.01.38-2.53-.51-2.69-.98-.09-.24-.48-.98-.82-1.18-.28-.15-.68-.52-.01-.53.63-.01 1.08.61 1.23.86.72 1.22 1.87.87 2.33.66.07-.53.28-.87.51-1.07-1.78-.21-3.64-.92-3.64-4.1 0-.91.31-1.66.82-2.25-.08-.2-.36-1.03.08-2.15 0 0 .67-.22 2.2.86.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.08 2.2-.86 2.2-.86.44 1.12.16 1.95.08 2.15.51.59.82 1.34.82 2.25 0 3.19-1.87 3.88-3.65 4.09.29.26.54.77.54 1.56 0 1.12-.01 2.02-.01 2.29 0 .21.15.47.55.39A8.33 8.33 0 0 0 16 8.33C16 3.73 12.42 0 8 0z" />
+            </svg>
+            <svg class="icon" viewBox="0 0 24 24" aria-label="Code">
+              <path fill="#2e7d32"
+                d="M8.7 16.7 4 12l4.7-4.7 1.4 1.4L6.8 12l3.3 3.3-1.4 1.4zm6.6 0-1.4-1.4 3.3-3.3-3.3-3.3 1.4-1.4L20 12l-4.7 4.7zM9.8 19l-1.9-.6L14.2 5l1.9.6z" />
+            </svg>
+          </div>
+        </div>
+
+        <div class="code-card">
+          <pre id="code">
+<span class="kw">from</span> <span class="mod">datetime</span> <span class="kw">import</span> <span class="mod">date</span>
+<span class="mod">today</span> <span class="kw">=</span> <span class="mod">date</span>.<span class="func">today</span>()
+
+<span class="mod">name</span> <span class="kw">=</span> <span class="str">"Your Name"</span>
+<span class="mod">username</span> <span class="kw">=</span> <span class="str">"@username"</span>
+
+<span class="mod">birthday</span> <span class="kw">=</span> <span class="mod">date</span>(<span class="num">2000</span>, <span class="num">1</span>, <span class="num">1</span>)
+
+<span class="kw">if</span> <span class="mod">today</span> <span class="kw">==</span> <span class="mod">birthday</span><span class="kw">:</span>
+    <span class="func">print</span>(<span class="str">f"🎉 Happy Birthday, {name}! Level up unlocked!"</span>)
+    <span class="func">party_mode</span>()
+    <span class="func">spawn_confetti</span>(<span class="str">'🧁'</span>)
+<span class="kw">elif</span> <span class="mod">today</span>.<span class="func">weekday</span>() <span class="kw">in</span> (<span class="num">5</span>, <span class="num">6</span>)<span class="kw">:</span>
+    <span class="func">print</span>(<span class="str">"🌿 Weekend vibes — rest, play, repeat."</span>)
+    <span class="func">recharge</span>()
+<span class="kw">else</span><span class="kw">:</span>
+    <span class="func">print</span>(<span class="str">"💻 Keep coding, keep growing."</span>)
+    <span class="func">work</span>()
+
+<span class="func">print</span>(<span class="str">"✨ End of script — beginning of greatness."</span>)
+</pre>
+
+        </div>
+
+        <div class="footer">
+          <div></div>
+          <div class="username" id="out-username">@username</div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+
+</html>
