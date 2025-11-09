@@ -1,0 +1,48 @@
+name: Refresh live screenshot
+
+on:
+  schedule:
+    - cron: "*/15 * * * *" # هر ۱۵ دقیقه
+  workflow_dispatch: {}     # امکان اجرا دستی
+  push:
+    paths:
+      - ".github/workflows/refresh-screenshot.yml"
+
+jobs:
+  shot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Make assets dir if missing
+        run: mkdir -p assets
+
+      - name: Try thum.io
+        id: thum
+        run: |
+          set -e
+          curl -fsSL \
+            "https://image.thum.io/get/width/900/crop/900x560/noanimate/https://power0matin.github.io/iran-provinces/" \
+            -o assets/preview.png
+          echo "ok=true" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Fallback to Microlink if thum.io failed
+        if: steps.thum.outputs.ok != 'true'
+        run: |
+          curl -fsSL \
+            "https://i.microlink.io/https://power0matin.github.io/iran-provinces/?screenshot=true" \
+            -o assets/preview.png
+
+      - name: Commit only if changed
+        run: |
+          if git diff --quiet -- assets/preview.png; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/preview.png
+          git commit -m "chore: refresh live screenshot"
+          git push
