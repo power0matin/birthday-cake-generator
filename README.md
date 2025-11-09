@@ -1,14 +1,4 @@
-<div style="
-  background: #fff3cd;
-  color: #856404;
-  border-bottom: 1px solid #ffeeba;
-  padding: 10px 20px;
-  font-family: sans-serif;
-  font-size: 15px;
-  text-align: center;
-">
-  ⚠️ This project is under development and not fully functional yet.
-</div>
+
 
 # 🎂 Birthday Cake Generator
 
