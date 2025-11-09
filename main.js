@@ -1,15 +1,47 @@
-// main.js — optimized & unified theming
+// main.js — Pro (CSS-aware, HTML-driven, print-safe)
 
-// ---------- helpers ----------
+// ---------- tiny helpers ----------
 const $ = (sel) => document.querySelector(sel);
+const ONE_DAY = 86400000;
 
+function escapeHtml(s = "") {
+  return String(s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function randHex() {
+  return (
+    "#" +
+    Math.floor(Math.random() * 0xffffff)
+      .toString(16)
+      .padStart(6, "0")
+  );
+}
+
+function parseYMD(dateStr) {
+  let y = 2000, m = 1, d = 1;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) [y, m, d] = dateStr.split("-").map(Number);
+  return { y, m, d };
+}
+
+function daysBetweenToday(y, m, d) {
+  try {
+    const today = new Date();
+    const base = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const target = new Date(y, m - 1, d);
+    const diff = Math.ceil((target - base) / ONE_DAY);
+    return Number.isFinite(diff) ? diff : "";
+  } catch { return ""; }
+}
+
+// ---------- DOM refs ----------
 const els = {
-  // inputs
   name: $("#inp-name"),
   username: $("#inp-username"),
   birthday: $("#inp-birthday"),
 
-  // color pickers
   clrBg: $("#clr-bg"),
   clrInk: $("#clr-ink"),
   clrKw: $("#clr-kw"),
@@ -21,23 +53,19 @@ const els = {
   clrCodeBg: $("#clr-codebg"),
   clrPunct: $("#clr-punct"),
 
-  // presets
   presetWarm: $("#preset-warm"),
   presetCool: $("#preset-cool"),
   presetDark: $("#preset-dark"),
 
-  // actions
   btnPNG: $("#btn-png"),
   btnPDF: $("#btn-pdf"),
   btnPrint: $("#btn-print"),
 
-  // outputs / stage
   outName: $("#out-name"),
   outUser: $("#out-username"),
   sheet: $("#sheet"),
   code: $("#code"),
 
-  // color actions
   btnResetColors: $("#btn-reset-colors"),
   btnRandomColors: $("#btn-random-colors"),
   btnSaveTheme: $("#btn-save-theme"),
@@ -48,24 +76,378 @@ const els = {
   inpImportTheme: $("#inp-import-theme"),
 };
 
-// ---------- defaults ----------
+// ---------- HTML-driven config (matches your CSS tokens) ----------
+const htmlCfg = (() => {
+  const s = els.sheet;
+  return {
+    // optional data-* overrides from #sheet
+    dateLabel: s?.dataset?.dateLabel || "",
+
+    defaultName: s?.dataset?.defaultName || "Your Name",
+    defaultUsername: s?.dataset?.defaultUsername || "@username",
+    defaultDate: s?.dataset?.defaultDate || "2000-01-01",
+
+    themeKey: s?.dataset?.themeKey || "poster_theme_v3",
+    filenamePrefix: s?.dataset?.filenamePrefix || "poster",
+  };
+})();
+
+// ---------- defaults (aligned with CSS tokens) ----------
 const defaults = {
-  name: "Your Name",
-  username: "@username",
-  birthday: "2000-01-01",
+  name: htmlCfg.defaultName,
+  username: htmlCfg.defaultUsername,
+  birthday: htmlCfg.defaultDate,
   colors: {
+    // must match :root tokens in your CSS
     bg: "#ffffff",
-    ink: "#222222",
+    ink: "#111111",
     kw: "#ff5722",
-    mod: "#8e24aa",
+    mod: "#6a1b9a",
     func: "#2e7d32",
     str: "#1565c0",
     num: "#d32f2f",
-    border: "#e0e0e0",
+    border: "#dfe3ea",
     codebg: "#fafafa",
     punct: "#444444",
   },
 };
+
+const THEME_KEY = htmlCfg.themeKey;
+
+// ---------- CSS var ops (scoped to #sheet to match your CSS) ----------
+function setCSSVars(colors, scope = els.sheet) {
+  if (!scope) return;
+  Object.entries(colors).forEach(([k, v]) => scope.style.setProperty(`--${k}`, v));
+}
+
+// Apply to both: root (for app surfaces) + sheet (poster)
+function applyTheme(colors) {
+  if (!colors) return;
+  // Set full token set on #sheet for poster colors
+  setCSSVars(colors, els.sheet);
+
+  // Basic sync for the app shell (only non-poster surfaces)
+  // We keep app colors gentle (use your CSS defaults for app)
+  document.documentElement.style.setProperty("--app-bg", getComputedStyle(document.documentElement).getPropertyValue("--app-bg") || "#eef1f5");
+  document.documentElement.style.setProperty("--surface", getComputedStyle(document.documentElement).getPropertyValue("--surface") || "#f7f8fb");
+  document.documentElement.style.setProperty("--surface-2", getComputedStyle(document.documentElement).getPropertyValue("--surface-2") || "#ffffff");
+}
+
+function getPickerColors() {
+  return {
+    bg: els.clrBg.value,
+    ink: els.clrInk.value,
+    kw: els.clrKw.value,
+    mod: els.clrMod.value,
+    func: els.clrFunc.value,
+    str: els.clrStr.value,
+    num: els.clrNum.value,
+    border: els.clrBorder.value,
+    codebg: els.clrCodeBg.value,
+    punct: els.clrPunct.value,
+  };
+}
+
+function setPickers(colors) {
+  if (!colors) return;
+  els.clrBg.value = colors.bg;
+  els.clrInk.value = colors.ink;
+  els.clrKw.value = colors.kw;
+  els.clrMod.value = colors.mod;
+  els.clrFunc.value = colors.func;
+  els.clrStr.value = colors.str;
+  els.clrNum.value = colors.num;
+  els.clrBorder.value = colors.border;
+  els.clrCodeBg.value = colors.codebg;
+  els.clrPunct.value = colors.punct;
+}
+
+function applyThemeFromPickers() {
+  applyTheme(getPickerColors());
+}
+
+// ---------- theme persistence ----------
+function saveTheme(colors) {
+  try { localStorage.setItem(THEME_KEY, JSON.stringify(colors)); } catch {}
+}
+function loadTheme() {
+  try { return JSON.parse(localStorage.getItem(THEME_KEY) || "null"); } catch { return null; }
+}
+
+// ---------- templating (auto from HTML) ----------
+function getCodeTemplate() {
+  // Prefer <template id="code-template">
+  const tplEl = document.querySelector("#code-template");
+  if (tplEl) {
+    if ("content" in tplEl) {
+      const holder = document.createElement("div");
+      holder.appendChild(tplEl.content.cloneNode(true));
+      return holder.innerHTML.trim();
+    }
+    return tplEl.innerHTML.trim();
+  }
+  // Fallback to any element with data-code-template
+  const alt = document.querySelector("[data-code-template]");
+  if (alt) return alt.innerHTML.trim();
+
+  // Legacy fallback (compatible with your CSS color classes)
+  return `
+<span class="kw">from</span> <span class="mod">datetime</span> <span class="kw">import</span> <span class="mod">date</span>
+<span class="mod">today</span> <span class="kw">=</span> <span class="mod">date</span>.<span class="func">today</span>()
+
+<span class="mod">name</span> <span class="kw">=</span> <span class="str">"{{name}}"</span>
+<span class="mod">username</span> <span class="kw">=</span> <span class="str">"{{username}}"</span>
+
+<span class="mod">birthday</span> <span class="kw">=</span> <span class="mod">date</span>(<span class="num">{{y}}</span>, <span class="num">{{m}}</span>, <span class="num">{{d}}</span>)
+
+<span class="kw">if</span> <span class="mod">today</span> <span class="kw">==</span> <span class="mod">birthday</span><span class="kw">:</span>
+    <span class="func">print</span>(<span class="str">f"🎉 Happy Birthday, {name}! Level up unlocked!"</span>)
+    <span class="func">party_mode</span>()
+    <span class="func">spawn_confetti</span>(<span class="str">'🧁'</span>)
+<span class="kw">elif</span> <span class="mod">today</span>.<span class="func">weekday</span>() <span class="kw">in</span> (<span class="num">5</span>, <span class="num">6</span>)<span class="kw">:</span>
+    <span class="func">print</span>(<span class="str">"🌿 Weekend vibes — rest, play, repeat."</span>)
+    <span class="func">recharge</span>()
+<span class="kw">else</span><span class="kw">:</span>
+    <span class="func">print</span>(<span class="str">"💻 Keep coding, keep growing."</span>)
+    <span class="func">work</span>()
+
+<span class="func">print</span>(<span class="str">"✨ End of script — beginning of greatness."</span>)
+`.trim();
+}
+
+function renderTemplate(tpl, ctx) {
+  return tpl.replace(/{{\s*(\w+)\s*}}/g, (_, k) => {
+    const v = ctx[k];
+    return v == null ? "" : escapeHtml(String(v));
+  });
+}
+
+// ---------- code rendering ----------
+function updateCode(name, user, dateStr) {
+  const { y, m, d } = parseYMD(dateStr);
+  const days_left = daysBetweenToday(y, m, d);
+
+  const tpl = getCodeTemplate();
+  const html = renderTemplate(tpl, { name, username: user, y, m, d, days_left });
+
+  if (els.code) els.code.innerHTML = "\n" + html + "\n";
+}
+
+// ---------- inputs sync (compatible with CSS & layout) ----------
+function applyInputs() {
+  const name = (els.name?.value.trim() || defaults.name);
+  const user = (els.username?.value.trim() || defaults.username);
+  const dateVal = (els.birthday?.value || defaults.birthday);
+
+  if (els.outName) els.outName.innerHTML = escapeHtml(name).replace(/\s/g, "&nbsp;");
+  if (els.outUser) els.outUser.textContent = user;
+
+  updateCode(name, user, dateVal);
+}
+
+function applyCustomLabels() {
+  if (!htmlCfg.dateLabel) return;
+  const inp = els.birthday;
+  const label = inp?.parentElement;
+  if (!label) return;
+  const firstTextNode = [...label.childNodes].find((n) => n.nodeType === Node.TEXT_NODE);
+  if (firstTextNode) firstTextNode.nodeValue = htmlCfg.dateLabel + " ";
+}
+
+// ---------- defaults + theme boot ----------
+function loadDefaults() {
+  if (els.name) els.name.value = defaults.name;
+  if (els.username) els.username.value = defaults.username;
+  if (els.birthday) els.birthday.value = defaults.birthday;
+
+  // Apply theme tokens to #sheet exactly as your CSS expects
+  applyTheme(defaults.colors);
+  setPickers(defaults.colors);
+
+  const saved = loadTheme();
+  if (saved) {
+    applyTheme(saved);
+    setPickers(saved);
+  }
+
+  applyInputs();
+}
+
+// ---------- export (print-safe, A4 landscape ready) ----------
+function sheetBgColor() {
+  try {
+    const cs = getComputedStyle(els.sheet);
+    const bg = cs.getPropertyValue("--bg").trim();
+    return bg || "#ffffff";
+  } catch { return "#ffffff"; }
+}
+
+async function rasterizeSheet() {
+  await document.fonts?.ready?.catch(() => {});
+  // Use higher pixelRatio for crisp text on print/retina
+  return await htmlToImage.toPng(els.sheet, {
+    pixelRatio: Math.max(2, Math.min(3, window.devicePixelRatio || 2)),
+    cacheBust: true,
+    backgroundColor: sheetBgColor(),
+  });
+}
+
+function download(dataUrl, filename) {
+  const a = document.createElement("a");
+  a.href = dataUrl;
+  a.download = filename;
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+async function savePNG() {
+  const dataUrl = await rasterizeSheet();
+  download(dataUrl, `${htmlCfg.filenamePrefix}-${Date.now()}.png`);
+}
+
+async function savePDF() {
+  const dataUrl = await rasterizeSheet();
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+  const pageW = pdf.internal.pageSize.getWidth();
+  const pageH = pdf.internal.pageSize.getHeight();
+  pdf.addImage(dataUrl, "PNG", 0, 0, pageW, pageH, undefined, "FAST");
+  pdf.save(`${htmlCfg.filenamePrefix}-${Date.now()}.pdf`);
+}
+
+// ---------- bindings (kept lightweight for your UI) ----------
+function bind() {
+  ["input", "change"].forEach((ev) => {
+    els.name?.addEventListener(ev, applyInputs);
+    els.username?.addEventListener(ev, applyInputs);
+    els.birthday?.addEventListener(ev, applyInputs);
+  });
+
+  [
+    els.clrBg, els.clrInk, els.clrKw, els.clrMod, els.clrFunc,
+    els.clrStr, els.clrNum, els.clrBorder, els.clrCodeBg, els.clrPunct,
+  ].forEach((el) => {
+    el?.addEventListener("input", applyThemeFromPickers);
+    el?.addEventListener("change", applyThemeFromPickers);
+  });
+
+  // Presets tuned to your CSS palette
+  if (els.presetWarm)
+    els.presetWarm.onclick = () =>
+      applyTheme({
+        bg: "#ffffff", ink: "#111111",
+        kw: "#ff5722", mod: "#6a1b9a", func: "#2e7d32", str: "#1565c0", num: "#d32f2f",
+        border: "#dfe3ea", codebg: "#fafafa", punct: "#444444",
+      });
+
+  if (els.presetCool)
+    els.presetCool.onclick = () =>
+      applyTheme({
+        bg: "#ffffff", ink: "#111111",
+        kw: "#00acc1", mod: "#3949ab", func: "#00897b", str: "#1976d2", num: "#e53935",
+        border: "#dfe3ea", codebg: "#f6f8fb", punct: "#3a3f47",
+      });
+
+  if (els.presetDark)
+    els.presetDark.onclick = () =>
+      applyTheme({
+        bg: "#121212", ink: "#f5f5f5",
+        kw: "#ff8a65", mod: "#ba68c8", func: "#81c784", str: "#64b5f6", num: "#ef5350",
+        border: "#333333", codebg: "#1e1e1e", punct: "#cccccc",
+      });
+
+  // Export actions
+  els.btnPNG && (els.btnPNG.onclick = savePNG);
+  els.btnPDF && (els.btnPDF.onclick = savePDF);
+  els.btnPrint && (els.btnPrint.onclick = () => window.print());
+
+  // Color actions
+  if (els.btnResetColors)
+    els.btnResetColors.onclick = () => {
+      setPickers(defaults.colors);
+      applyTheme(defaults.colors);
+    };
+
+  if (els.btnRandomColors)
+    els.btnRandomColors.onclick = () => {
+      const light = Math.random() > 0.5;
+      const palette = {
+        bg: light ? "#ffffff" : "#121212",
+        ink: light ? "#111111" : "#f5f5f5",
+        kw: randHex(), mod: randHex(), func: randHex(), str: randHex(), num: randHex(),
+        border: light ? "#dfe3ea" : "#333333",
+        codebg: light ? "#fafafa" : "#1e1e1e",
+        punct: light ? "#444444" : "#cccccc",
+      };
+      setPickers(palette);
+      applyTheme(palette);
+    };
+
+  if (els.btnSaveTheme)
+    els.btnSaveTheme.onclick = () => {
+      const c = getPickerColors();
+      saveTheme(c);
+      els.btnSaveTheme.textContent = "Saved ✓";
+      setTimeout(() => (els.btnSaveTheme.textContent = "Save"), 900);
+    };
+
+  if (els.btnLoadTheme)
+    els.btnLoadTheme.onclick = () => {
+      const c = loadTheme();
+      if (c) { setPickers(c); applyTheme(c); }
+      else {
+        els.btnLoadTheme.textContent = "No Theme";
+        setTimeout(() => (els.btnLoadTheme.textContent = "Load"), 900);
+      }
+    };
+
+  if (els.btnCopyCSS)
+    els.btnCopyCSS.onclick = async () => {
+      const colors = getPickerColors();
+      const css = `:root{
+  --bg:${colors.bg}; --ink:${colors.ink}; --kw:${colors.kw}; --mod:${colors.mod};
+  --func:${colors.func}; --str:${colors.str}; --num:${colors.num}; --border:${colors.border};
+  --codebg:${colors.codebg}; --punct:${colors.punct};
+}`;
+      await navigator.clipboard?.writeText(css);
+      els.btnCopyCSS.textContent = "Copied ✓";
+      setTimeout(() => (els.btnCopyCSS.textContent = "Copy CSS"), 900);
+    };
+
+  if (els.btnExportTheme)
+    els.btnExportTheme.onclick = () => {
+      const blob = new Blob([JSON.stringify(getPickerColors(), null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "theme.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+
+  if (els.btnImportTheme)
+    els.btnImportTheme.onclick = () => els.inpImportTheme?.click();
+
+  if (els.inpImportTheme)
+    els.inpImportTheme.onchange = async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      try {
+        const c = JSON.parse(await file.text());
+        setPickers(c); applyTheme(c);
+      } catch { alert("Invalid theme file."); }
+      finally { e.target.value = ""; }
+    };
+}
+
+// ---------- boot ----------
+window.addEventListener("DOMContentLoaded", () => {
+  loadDefaults();
+  bind();
+  applyCustomLabels(); // set date label from data-date-label (optional)
+});};
 
 const THEME_KEY = "cake_poster_theme_v1";
 
