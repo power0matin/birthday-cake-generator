@@ -149,31 +149,42 @@
           </div>
         </div>
 
-        <div class="code-card">
-          <pre id="code">
+<pre id="code">
 <span class="kw">from</span> <span class="mod">datetime</span> <span class="kw">import</span> <span class="mod">date</span>
 <span class="mod">today</span> <span class="kw">=</span> <span class="mod">date</span>.<span class="func">today</span>()
 
 <span class="mod">name</span> <span class="kw">=</span> <span class="str">"Your Name"</span>
 <span class="mod">username</span> <span class="kw">=</span> <span class="str">"@username"</span>
 
-<span class="mod">birthday</span> <span class="kw">=</span> <span class="mod">date</span>(<span class="num">2000</span>, <span class="num">1</span>, <span class="num">1</span>)
+<span class="mod">exam_day</span> <span class="kw">=</span> <span class="mod">date</span>(<span class="num">2026</span>, <span class="num">6</span>, <span class="num">30</span>)  <span class="punct">#</span> <span class="str">تاریخ کنکور را تنظیم کن</span>
+<span class="mod">days_left</span> <span class="kw">=</span> (<span class="mod">exam_day</span> <span class="kw">-</span> <span class="mod">today</span>).<span class="func">days</span>
 
-<span class="kw">if</span> <span class="mod">today</span> <span class="kw">==</span> <span class="mod">birthday</span><span class="kw">:</span>
-    <span class="func">print</span>(<span class="str">f"🎉 Happy Birthday, {name}! Level up unlocked!"</span>)
-    <span class="func">party_mode</span>()
-    <span class="func">spawn_confetti</span>(<span class="str">'🧁'</span>)
-<span class="kw">elif</span> <span class="mod">today</span>.<span class="func">weekday</span>() <span class="kw">in</span> (<span class="num">5</span>, <span class="num">6</span>)<span class="kw">:</span>
-    <span class="func">print</span>(<span class="str">"🌿 Weekend vibes — rest, play, repeat."</span>)
-    <span class="func">recharge</span>()
+<span class="comment"># قانون طلایی کنکور: تمرکز، استمرار، بدون بهانه</span>
+<span class="mod">focus</span> <span class="kw">=</span> <span class="num">0</span>
+<span class="kw">for</span> <span class="mod">day</span> <span class="kw">in</span> <span class="func">range</span>(<span class="mod">days_left</span>, <span class="num">0</span>, <span class="kw">-</span><span class="num">1</span>)<span class="kw">:</span>
+    <span class="kw">if</span> <span class="mod">day</span> <span class="kw">%</span> <span class="num">7</span> <span class="kw">==</span> <span class="num">0</span><span class="kw">:</span>
+        <span class="func">recharge</span>()                     <span class="comment"># استراحت هدفمند = دوام بیشتر</span>
+    <span class="func">study</span>(<span class="mod">hours</span><span class="kw">=</span><span class="num">6</span>)               <span class="comment"># مطالعه‌ی عمیق</span>
+    <span class="func">practice</span>(<span class="mod">questions</span><span class="kw">=</span><span class="num">30</span>)        <span class="comment"># تمرین تست هدفمند</span>
+    <span class="func">review</span>()                        <span class="comment"># مرور برای تثبیت</span>
+    <span class="mod">focus</span> <span class="kw">+=</span> <span class="num">1</span>
+
+<span class="kw">try</span><span class="kw">:</span>
+    <span class="func">stay_confident</span>()               <span class="comment"># به خودت باور داشته باش</span>
+    <span class="func">manage</span>(<span class="mod">distractions</span><span class="kw">=</span><span class="kw">False</span>)   <span class="comment"># حواس‌پرتی‌ها تعطیل</span>
+<span class="kw">except</span> <span class="mod">Stress</span><span class="kw">:</span>
+    <span class="func">debug</span>(<span class="mod">mindset</span>)               <span class="comment"># ذهنیتت را دیباگ کن</span>
+<span class="kw">finally</span><span class="kw">:</span>
+    <span class="func">print</span>(<span class="str">"📚 به فرایند اعتماد کن — یک سؤال در هر لحظه."</span>)
+    <span class="func">print</span>(<span class="str">"🔥 تلاش امروزت = موفقیت فردایت."</span>)
+
+<span class="kw">if</span> <span class="mod">days_left</span> <span class="kw">==</span> <span class="num">0</span><span class="kw">:</span>
+    <span class="func">print</span>(<span class="str">"🚀 روز کنکور: نفس عمیق، تمرکز، اجرا."</span>)
 <span class="kw">else</span><span class="kw">:</span>
-    <span class="func">print</span>(<span class="str">"💻 Keep coding, keep growing."</span>)
-    <span class="func">work</span>()
+    <span class="func">print</span>(<span class="str">f"🎯 تا کنکور: {days_left} روز — ادامه بده!"</span>)
 
-<span class="func">print</span>(<span class="str">"✨ End of script — beginning of greatness."</span>)
+<span class="func">print</span>(<span class="str">"✨ پایان خط نیست — شروع مسیرِ نتیجه‌های بزرگه."</span>)
 </pre>
-
-        </div>
 
         <div class="footer">
           <div></div>
