@@ -14,7 +14,9 @@ With this project you can edit your **name**, **username**, **birthday**, and **
   </a>
 </p>
 
-👉 [birthday-cake-generator](https://power0matin.github.io/birthday-cake-generator/)
+👉 [Birthday Cake Generator](https://power0matin.github.io/birthday-cake-generator/)
+
+👉 [Exam Motivational Poster Generator](https://power0matin.github.io/birthday-cake-generator/)
 
 
 ## ✨ Features
