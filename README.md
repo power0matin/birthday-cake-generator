@@ -62,9 +62,9 @@ Edit the `defaults` object inside `main.js` to set your own default:
 
 ```js
 const defaults = {
-  name: "Matin Shahabadi",
-  username: "@powermatin",
-  birthday: "2007-10-14",
+  name: "Your Name",
+  username: "@username",
+  birthday: "year-month-day",
 };
 ```
 
