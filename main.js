@@ -26,6 +26,7 @@ const els = {
   btnPNG: $("#btn-png"),
   btnPDF: $("#btn-pdf"),
   btnPrint: $("#btn-print"),
+  btnShare: $("#btn-share"),
 
   outName: $("#out-name"),
   outUser: $("#out-username"),
@@ -133,6 +134,56 @@ function setPickers(c) {
 }
 function applyThemeFromPickers() {
   applyTheme(getPickerColors());
+}
+// ---------- shareable URL ----------
+function makeShareURL() {
+  const colors = getPickerColors();
+  const params = new URLSearchParams({
+    n: els.name?.value || "",
+    u: els.username?.value || "",
+    d: els.birthday?.value || "",
+    bg: colors.bg,
+    ink: colors.ink,
+    kw: colors.kw,
+    mod: colors.mod,
+    func: colors.func,
+    str: colors.str,
+    num: colors.num,
+    border: colors.border,
+    codebg: colors.codebg,
+    punct: colors.punct,
+  });
+  return `${location.origin}${location.pathname}?${params.toString()}`;
+}
+
+function loadFromURL() {
+  const p = new URLSearchParams(location.search);
+  if ([...p.keys()].length === 0) return;
+
+  // ورودی‌های متن
+  if (els.name) els.name.value = p.get("n") || els.name.value || "";
+  if (els.username) els.username.value = p.get("u") || els.username.value || "";
+  if (els.birthday) els.birthday.value = p.get("d") || els.birthday.value || "";
+
+  // رنگ‌ها
+  const c = {
+    bg: p.get("bg") || undefined,
+    ink: p.get("ink") || undefined,
+    kw: p.get("kw") || undefined,
+    mod: p.get("mod") || undefined,
+    func: p.get("func") || undefined,
+    str: p.get("str") || undefined,
+    num: p.get("num") || undefined,
+    border: p.get("border") || undefined,
+    codebg: p.get("codebg") || undefined,
+    punct: p.get("punct") || undefined,
+  };
+  Object.keys(c).forEach((k) => c[k] === undefined && delete c[k]);
+  if (Object.keys(c).length) {
+    setPickers({ ...getPickerColors(), ...c });
+    applyThemeFromPickers();
+  }
+  applyInputs();
 }
 
 // ---------- misc ----------
@@ -474,6 +525,19 @@ function bind() {
   if (els.btnPNG) els.btnPNG.onclick = savePNG;
   if (els.btnPDF) els.btnPDF.onclick = savePDF;
   if (els.btnPrint) els.btnPrint.onclick = () => window.print();
+  if (els.btnShare)
+    els.btnShare.onclick = async () => {
+      const url = makeShareURL();
+      try {
+        await navigator.clipboard?.writeText(url);
+        els.btnShare.textContent = "Copied ✓";
+      } catch {
+        // اگر Clipboard در دسترس نبود، حداقل لینک را نشان بده
+        window.prompt("Copy this link", url);
+      } finally {
+        setTimeout(() => (els.btnShare.textContent = "Share Link"), 1200);
+      }
+    };
 
   if (els.btnResetColors)
     els.btnResetColors.onclick = () => {
@@ -546,4 +610,5 @@ window.addEventListener("DOMContentLoaded", () => {
   THEME_KEY = cfg.themeKey;
   loadDefaults();
   bind();
+  loadFromURL();
 });
