@@ -2,18 +2,16 @@ name: Refresh live screenshot
 
 on:
   schedule:
-    - cron: "*/15 * * * *" # هر 15 دقیقه
-  workflow_dispatch: {} # اجرا دستی
+    - cron: "*/15 * * * *"   # هر 15 دقیقه
+  workflow_dispatch: {}
   push:
     paths:
       - ".github/workflows/refresh-screenshot.yml"
 
-# جلوگیری از همپوشانی اجراها
 concurrency:
   group: refresh-screenshot-${{ github.ref }}
   cancel-in-progress: true
 
-# اجازهٔ push به ریپو
 permissions:
   contents: write
 
@@ -22,16 +20,14 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      # ⬇️ مقادیر قابل تنظیم ⬇️
-      TARGET_URL: "https://power0matin.github.io/birthday-cake-generator/" # آدرس دموی آنلاین
-      OUTPUT_PATH: "assets/birthday-cake-preview.png" # مقصد خروجی
-      VIEWPORT_WIDTH: "1920" # عرض ویوپورت (Full HD)
-      VIEWPORT_HEIGHT: "1080" # ارتفاع ویوپورت (Full HD)
-      DEVICE_SCALE_FACTOR: "2" # اگر وضوح بالاتر خواستی = 2 (اما ابعاد فایل بزرگ‌تر می‌شود)
-      WAIT_MS: "1500" # تاخیر بعد از networkidle
-      NAV_TIMEOUT_MS: "45000" # تایم‌اوت ناوبری
-      RETRIES: "3" # تعداد تلاش‌ها
-      # ⬆️ قابل تنظیم ⬆️
+      TARGET_URL: "https://power0matin.github.io/birthday-cake-generator/"
+      OUTPUT_PATH: "assets/birthday-cake-preview.png"
+      VIEWPORT_WIDTH: "1920"
+      VIEWPORT_HEIGHT: "1080"
+      DEVICE_SCALE_FACTOR: "2"     # اگر شارپ‌تر خواستی 2 کن (حجم فایل بیشتر می‌شود)
+      WAIT_MS: "1500"
+      NAV_TIMEOUT_MS: "45000"
+      RETRIES: "3"
 
     steps:
       - name: Checkout
@@ -62,11 +58,11 @@ jobs:
 
           const vw  = parseInt(process.env.VIEWPORT_WIDTH  || '1920', 10);
           const vh  = parseInt(process.env.VIEWPORT_HEIGHT || '1080', 10);
-          const dpr = parseFloat(process.env.DEVICE_SCALE_FACTOR || '1');
+          const dpr = parseFloat(process.env.DEVICE_SCALE_FACTOR || '2');
 
-          const waitMs    = parseInt(process.env.WAIT_MS || '1500', 10);
-          const navTO     = parseInt(process.env.NAV_TIMEOUT_MS || '45000', 10);
-          const retries   = parseInt(process.env.RETRIES || '3', 10);
+          const waitMs  = parseInt(process.env.WAIT_MS || '1500', 10);
+          const navTO   = parseInt(process.env.NAV_TIMEOUT_MS || '45000', 10);
+          const retries = parseInt(process.env.RETRIES || '3', 10);
 
           if (!url || !out) {
             console.error('TARGET_URL or OUTPUT_PATH missing');
@@ -77,22 +73,24 @@ jobs:
             const browser = await chromium.launch({
               headless: true,
               args: [
-                '--force-color-profile=srgb',  // رنگ پایدار
+                '--force-color-profile=srgb',
                 `--window-size=${vw},${vh}`
               ],
             });
+
             const context = await browser.newContext({
               viewport: { width: vw, height: vh },
               deviceScaleFactor: dpr,
               userAgent: 'github-actions-playwright',
-              colorScheme: 'light', // اگر دمو در تم تیره بهتر است، 'dark'
+              colorScheme: 'light',
             });
+
             const page = await context.newPage();
 
             try {
               await page.goto(url, { waitUntil: 'networkidle', timeout: navTO });
 
-              // حذف اسکرول‌بارها و اختلاف‌های ریزِ رندر قبل از عکس
+              // حذف اسکرول‌بار و اختلاف‌های جزئی پیش از اسکرین‌شات
               await page.addStyleTag({ content: `
                 ::-webkit-scrollbar { display: none !important; }
                 html, body { overflow: hidden !important; }
@@ -100,17 +98,17 @@ jobs:
 
               await page.waitForTimeout(waitMs);
 
-              // تصویر دقیقاً به اندازه‌ی ویوپورت (نه کل صفحهٔ بلند)
               await page.screenshot({
                 path: out,
                 type: 'png',
-                fullPage: false
+                fullPage: false   // دقیقا 1920x1080
               });
 
               await browser.close();
               return true;
             } catch (e) {
-              console.error(\`Attempt #\${tryNo} failed:\`, e.message);
+              const msg = (e && e.message) ? e.message : String(e);
+              console.error('Attempt #' + tryNo + ' failed: ' + msg);
               await browser.close();
               return false;
             }
@@ -122,6 +120,7 @@ jobs:
             if (ok) break;
             await new Promise(r => setTimeout(r, 1000 * i)); // backoff ساده
           }
+
           if (!ok) {
             console.error('All attempts failed.');
             process.exit(1);
@@ -135,7 +134,6 @@ jobs:
         run: |
           BYTES=$(wc -c < "$OUTPUT_PATH" | tr -d ' ')
           echo "File size: $BYTES bytes"
-          # با فول‌اچ‌دی معمولاً خیلی بیشتر از 20KB است
           test "$BYTES" -ge 20000
 
       - name: Commit only if changed
