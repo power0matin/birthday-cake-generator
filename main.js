@@ -27,6 +27,10 @@ const els = {
   btnPDF: $("#btn-pdf"),
   btnPrint: $("#btn-print"),
   btnShare: $("#btn-share"),
+  btnLogoRemove: $("#btn-logo-remove"),
+  logoFile: $("#logo-file"),
+  logoHideExport: $("#logo-hide-export"),
+  avatar: $("#avatar"),
 
   outName: $("#out-name"),
   outUser: $("#out-username"),
@@ -407,9 +411,13 @@ async function withExportStyles(run) {
 
 async function savePNG() {
   if (!els.sheet) return;
+  if (!window.htmlToImage?.toPng) {
+    alert("Image exporter not loaded yet. Please try again in a second.");
+    return;
+  }
   await withExportStyles(async () => {
     const bg = getComputedStyle(els.sheet).backgroundColor || "#ffffff";
-    const dataUrl = await htmlToImage.toPng(els.sheet, {
+    const dataUrl = await window.htmlToImage.toPng(els.sheet, {
       pixelRatio: 2,
       cacheBust: true,
       backgroundColor: bg,
@@ -420,9 +428,13 @@ async function savePNG() {
 
 async function savePDF() {
   if (!els.sheet) return;
+  if (!window.htmlToImage?.toPng || !window.jspdf?.jsPDF) {
+    alert("PDF exporter not ready yet. Try again shortly.");
+    return;
+  }
   await withExportStyles(async () => {
     const bg = getComputedStyle(els.sheet).backgroundColor || "#ffffff";
-    const dataUrl = await htmlToImage.toPng(els.sheet, {
+    const dataUrl = await window.htmlToImage.toPng(els.sheet, {
       pixelRatio: 2,
       cacheBust: true,
       backgroundColor: bg,
@@ -443,11 +455,15 @@ async function savePDF() {
 // ---------- print: fit before/after ----------
 window.addEventListener("beforeprint", () => {
   document.documentElement.classList.add("exporting");
-  // نگه‌دارنده برای پس از چاپ
+  // Failsafe for some browsers
+  if (els.logoHideExport?.checked && els.avatar) {
+    els.avatar.style.setProperty("display", "none", "important");
+  }
   window.__restorePrintFit = fitCodeByFont();
 });
 window.addEventListener("afterprint", () => {
   document.documentElement.classList.remove("exporting");
+  if (els.avatar) els.avatar.style.removeProperty("display");
   if (window.__restorePrintFit) {
     window.__restorePrintFit();
     window.__restorePrintFit = null;
@@ -455,13 +471,42 @@ window.addEventListener("afterprint", () => {
 });
 
 // ---------- bindings ----------
+function syncURL() {
+  const colors = getPickerColors();
+  const params = new URLSearchParams({
+    n: els.name?.value || "",
+    u: els.username?.value || "",
+    d: els.birthday?.value || "",
+    bg: colors.bg,
+    ink: colors.ink,
+    kw: colors.kw,
+    mod: colors.mod,
+    func: colors.func,
+    str: colors.str,
+    num: colors.num,
+    border: colors.border,
+    codebg: colors.codebg,
+    punct: colors.punct,
+  });
+  history.replaceState(null, "", `${location.pathname}?${params.toString()}`);
+}
 function bind() {
   ["input", "change"].forEach((ev) => {
     els.name?.addEventListener(ev, applyInputs);
     els.username?.addEventListener(ev, applyInputs);
     els.birthday?.addEventListener(ev, applyInputs);
+    els.name?.addEventListener(ev, syncURL);
+    els.username?.addEventListener(ev, syncURL);
+    els.birthday?.addEventListener(ev, syncURL);
   });
-
+  function debounce(fn, ms = 80) {
+    let t;
+    return (...a) => {
+      clearTimeout(t);
+      t = setTimeout(() => fn(...a), ms);
+    };
+  }
+  const applyThemeFromPickersDebounced = debounce(applyThemeFromPickers, 60);
   [
     els.clrBg,
     els.clrInk,
@@ -475,8 +520,14 @@ function bind() {
     els.clrPunct,
   ].forEach((el) => {
     if (!el) return;
-    el.addEventListener("input", applyThemeFromPickers);
-    el.addEventListener("change", applyThemeFromPickers);
+    el.addEventListener("input", (e) => {
+      applyThemeFromPickersDebounced(e);
+      syncURL();
+    });
+    el.addEventListener("change", (e) => {
+      applyThemeFromPickers(e);
+      syncURL();
+    });
   });
 
   if (els.presetWarm)
@@ -532,12 +583,142 @@ function bind() {
         await navigator.clipboard?.writeText(url);
         els.btnShare.textContent = "Copied ✓";
       } catch {
-        // اگر Clipboard در دسترس نبود، حداقل لینک را نشان بده
         window.prompt("Copy this link", url);
       } finally {
         setTimeout(() => (els.btnShare.textContent = "Share Link"), 1200);
       }
     };
+
+  // ---- Avatar / Logo handlers (final, optimized) ----
+  (() => {
+    if (!els.avatar && !els.logoFile && !els.btnLogoRemove) return;
+
+    // cache common nodes
+    const dz = document.querySelector(".file-drop");
+    const dzHint = document.querySelector(".file-drop .file-drop__hint");
+    const sw = document.querySelector(".logo-actions .switch");
+    const hideInput = document.getElementById("logo-hide-export");
+
+    // helpers
+    const setHint = (text) => {
+      if (dzHint) dzHint.textContent = text;
+    };
+
+    const revokeAvatarURL = () => {
+      const url = els.avatar?.dataset?.url;
+      if (!url) return;
+      try {
+        URL.revokeObjectURL(url);
+      } catch {}
+      if (els.avatar?.dataset) delete els.avatar.dataset.url;
+    };
+
+    const setHideSwitchEnabled = (enabled) => {
+      if (!sw || !hideInput) return;
+      sw.classList.toggle("is-disabled", !enabled);
+      hideInput.disabled = !enabled;
+    };
+
+    const syncAvatarHideClass = () => {
+      if (!els.avatar) return;
+      const hide = !!els.logoHideExport?.checked;
+      els.avatar.classList.toggle("hide-on-export", hide);
+    };
+
+    const applyAvatar = (file) => {
+      if (!els.avatar || !file) return;
+      if (!file.type?.startsWith("image/")) {
+        alert("Please choose an image file.");
+        return;
+      }
+      if (file.size > 6 * 1024 * 1024) {
+        alert("Image is larger than 6MB.");
+        return;
+      }
+      revokeAvatarURL();
+      const url = URL.createObjectURL(file);
+      els.avatar.src = url;
+      els.avatar.dataset.url = url;
+      els.avatar.style.display = "";
+      setHint(file.name || "Click or drop an image");
+      setHideSwitchEnabled(true);
+      syncAvatarHideClass();
+    };
+
+    const clearAvatar = () => {
+      if (!els.avatar) return;
+      revokeAvatarURL();
+      els.avatar.removeAttribute("src");
+      els.avatar.style.display = "none";
+      if (els.logoFile) els.logoFile.value = "";
+      setHint("Click or drop an image");
+      if (hideInput) hideInput.checked = false;
+      setHideSwitchEnabled(false);
+    };
+
+    const handleFileList = (files) => {
+      const file = files?.[0];
+      if (!file) return;
+      applyAvatar(file);
+    };
+
+    // input: file change
+    if (els.logoFile) {
+      els.logoFile.addEventListener("change", () =>
+        handleFileList(els.logoFile.files)
+      );
+      // also keep switch state in sync
+      els.logoFile.addEventListener("change", () =>
+        setHideSwitchEnabled(!!els.logoFile.files?.[0])
+      );
+    }
+
+    // remove button
+    if (els.btnLogoRemove) {
+      els.btnLogoRemove.addEventListener("click", () => {
+        clearAvatar();
+      });
+    }
+
+    // dropzone: drag & drop
+    if (dz && els.logoFile) {
+      const enterOver = (e) => {
+        e.preventDefault();
+        dz.classList.add("is-dragover");
+      };
+      const leaveDrop = (e) => {
+        e.preventDefault();
+        dz.classList.remove("is-dragover");
+      };
+
+      ["dragenter", "dragover"].forEach((evt) =>
+        dz.addEventListener(evt, enterOver)
+      );
+      ["dragleave", "drop"].forEach((evt) =>
+        dz.addEventListener(evt, leaveDrop)
+      );
+
+      dz.addEventListener("drop", (e) => {
+        const file = e.dataTransfer?.files?.[0];
+        if (!file) return;
+        // mirror into hidden input so browser state stays consistent
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        els.logoFile.files = dt.files;
+        handleFileList(els.logoFile.files);
+      });
+    }
+
+    // hide-on-export toggle
+    if (els.logoHideExport) {
+      els.logoHideExport.addEventListener("change", syncAvatarHideClass);
+    }
+
+    // initial state (bind() runs after DOMContentLoaded)
+    const hasAvatar = !!(els.avatar && els.avatar.src);
+    setHideSwitchEnabled(hasAvatar);
+    syncAvatarHideClass();
+  })();
 
   if (els.btnResetColors)
     els.btnResetColors.onclick = () => {

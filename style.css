@@ -139,6 +139,12 @@ html.exporting .code-card pre {
   --panel-bg: var(--surface);
   --panel-border: #d9dde6;
   --card-bg: var(--surface-2);
+
+  --avatar-size: 48px;
+  --avatar-radius: 12px;
+  --drop-border: #d9dde6;
+  --drop-bg: var(--surface-2);
+  --drop-hover: #eef1f5;
 }
 
 /* ==========================================================================
@@ -182,6 +188,7 @@ body {
   gap: 12px;
   position: relative;
   box-shadow: 0 10px 25px rgba(17, 24, 39, .06);
+  margin-bottom: 5%;
 }
 
 .panel h1 {
@@ -485,4 +492,234 @@ pre {
   font-size: 12px;
   padding: 8px 10px;
   border-radius: 8px;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip: rect(0 0 0 0);
+  overflow: hidden;
+}
+
+.logo-group {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.logo-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  margin: 10px 0 0;
+  background: var(--surface-2);
+  border: 1px solid #e6ebf3;
+  border-radius: 10px;
+}
+
+.logo-controls {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+/* Drop zone / button for file input */
+.file-drop {
+  display: grid;
+  align-items: center;
+  justify-items: start;
+  gap: 4px;
+  padding: 12px 14px;
+  margin: 2px 0 8px;
+  border: 1px dashed var(--drop-border);
+  border-radius: var(--radius-sm);
+  background: var(--drop-bg);
+  cursor: pointer;
+  user-select: none;
+  transition: background .15s ease, border-color .15s ease, transform .04s ease;
+}
+
+
+.file-drop:hover,
+.file-drop:focus {
+  background: var(--drop-hover);
+  border-color: #c8d0dc;
+}
+
+.file-drop:active {
+  transform: translateY(1px);
+}
+
+.file-drop__title {
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.file-drop__hint {
+  font-size: 12px;
+  line-height: 1.2;
+  opacity: .75;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Hide-on-export checkbox tidy */
+.logo-hide {
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+/* Remove button emphasis */
+.btn-danger {
+  border-color: #f2c9c9;
+  background: #fff5f5;
+}
+
+.file-drop.is-dragover {
+  background: var(--drop-hover);
+  border-color: #c8d0dc;
+  border-style: solid;
+}
+
+.btn-danger:hover {
+  background: #ffe9e9;
+}
+
+/* ---------- Avatar in header ---------- */
+.header .avatar {
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  object-fit: cover;
+  border-radius: var(--avatar-radius);
+  border: 1px solid var(--border, #ddd);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .08);
+  margin-inline-start: 8px;
+  inline-size: auto;
+}
+
+html.exporting .hide-on-export {
+  display: none !important;
+}
+
+/* Hide on real print */
+@media print {
+  .hide-on-export {
+    display: none !important;
+  }
+
+  .sheet .hide-on-export {
+    display: none !important;
+  }
+}
+
+
+@media (max-width: 680px) {
+  :root {
+    --avatar-size: 40px;
+  }
+}
+
+/* --- Modern compact switch --- */
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.switch input {
+  appearance: none;
+  -webkit-appearance: none;
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch .slider {
+  inline-size: 36px;
+  block-size: 20px;
+  border-radius: 999px;
+  background: #e9edf5;
+  border: 1px solid #d6dce7;
+  position: relative;
+  transition: background .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+.switch .slider::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 2px;
+  inset-inline-start: 2px;
+  inline-size: 16px;
+  block-size: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .12);
+  transition: transform .15s ease;
+}
+
+.switch:hover .slider {
+  border-color: #c8d0dc;
+  background: #eef2f8;
+}
+
+.switch input:focus-visible+.slider {
+  box-shadow: 0 0 0 3px var(--focus, rgba(46, 125, 50, .25));
+}
+
+.switch input:checked+.slider {
+  background: rgba(46, 125, 50, .22);
+  border-color: rgba(46, 125, 50, .45);
+}
+
+.switch input:checked+.slider::after {
+  transform: translateX(16px);
+}
+
+.switch-label {
+  color: #2b2f36;
+  line-height: 1;
+  opacity: .9;
+}
+
+.switch.is-disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.switch.is-disabled .slider {
+  background: #f2f4f8;
+  border-color: #e3e7ef;
+}
+
+.switch.is-disabled .switch-label {
+  opacity: .7;
+}
+
+/* very small screens */
+@media (max-width:420px) {
+  .logo-actions {
+    padding: 6px 8px;
+  }
+
+  .switch {
+    gap: 8px;
+    font-size: 12px;
+  }
 }
