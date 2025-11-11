@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="https://power0matin.github.io/birthday-cake-generator/">
-    <img alt="Poster preview" src="./assets/birthday-cake-preview.png" width="900">
+    <img alt="Poster preview" src="./assets/birthday-cake-preview.png" width="100%" loading="lazy">
   </a>
 </p>
 
