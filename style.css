@@ -156,7 +156,9 @@ html.exporting .code-card pre {
 
 html,
 body {
-  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: auto;
   margin: 0;
   background: var(--app-bg);
   color: var(--ink);
@@ -164,6 +166,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 
 ::selection {
   background: #ffe0d3;
@@ -173,9 +176,18 @@ body {
 .app {
   display: grid;
   grid-template-columns: minmax(360px, 420px) 1fr;
-  height: 100vh;
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: auto;
   gap: var(--gap);
   padding: var(--gap);
+  align-content: start;
+  padding-bottom: 60px;
+}
+
+.panel,
+.stage-wrap {
+  align-self: start;
 }
 
 .panel {
@@ -722,4 +734,334 @@ html.exporting .hide-on-export {
     gap: 8px;
     font-size: 12px;
   }
+}
+
+/* ===== Site Shell (Header/Footer) ===== */
+.site-container {
+  width: min(1080px, 100% - 2*var(--gap));
+  margin-inline: auto;
+  padding-inline: 0;
+}
+
+/* Header */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in oklab, var(--surface) 90%, white 10%);
+  border-bottom: 1px solid var(--panel-border);
+  backdrop-filter: saturate(120%) blur(6px);
+  margin-bottom: 6px;
+}
+
+.site-header .site-container {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  /* کمی جمع‌وجورتر */
+  padding-block: 6px;
+}
+
+.site-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.site-header .nav-toggle {
+  display: none;
+  place-items: center;
+  width: 36px;
+  height: 32px;
+  border: 1px solid var(--btn-border);
+  background: var(--btn-neutral);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.site-header .nav-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (min-width: 781px) {
+  .site-header .nav-toggle {
+    display: none !important;
+  }
+}
+
+/* دسکتاپ: گروه پیلی */
+.site-nav {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(17, 24, 39, .04);
+}
+
+.nav-link {
+  padding: 6px 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #2b2f36;
+  line-height: 1;
+  /* هم‌ارتفاع با کپسول */
+}
+
+.nav-link:hover {
+  background: var(--btn-neutral);
+}
+
+.btn-ghost {
+  padding: 6px 10px;
+  border: 1px solid var(--btn-border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.btn-ghost:hover {
+  background: #f8fafc;
+}
+
+.site-nav {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(17, 24, 39, .04);
+}
+
+.nav-link:hover {
+  background: var(--btn-neutral);
+}
+
+.btn-ghost {
+  padding: 8px 12px;
+  border: 1px solid var(--btn-border);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.btn-ghost:hover {
+  background: #f8fafc;
+}
+
+.nav-toggle {
+  display: none;
+  border: 1px solid var(--btn-border);
+  background: #fff;
+  border-radius: 10px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+/* Mobile */
+@media (max-width: 780px) {
+
+  /* کانتینر هدر مرجع پوزیشن منو و دکمه باشد */
+  .site-header .site-container {
+    position: relative;
+    min-height: 56px;
+  }
+
+  /* دکمه منو: بالا-راست */
+  .nav-toggle,
+  .site-header .nav-toggle {
+    display: grid;
+    place-items: center;
+    position: absolute;
+    right: var(--gap);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 32px;
+    border: 1px solid var(--btn-border);
+    background: var(--btn-neutral);
+    border-radius: 10px;
+    z-index: 120;
+    /* بالاتر از منو */
+  }
+
+  .site-header .nav-toggle svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* منوی پاپ‌اور: زیر دکمه و چسبیده به راست */
+  .site-nav {
+    position: absolute;
+    top: calc(100% + 8px);
+    /* دقیقاً زیر هدر */
+    right: var(--gap);
+    left: auto;
+    background: var(--surface-2);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    box-shadow: 0 12px 28px rgba(17, 24, 39, .12);
+    display: none;
+    padding: 8px;
+    grid-auto-flow: row;
+    gap: 4px;
+    z-index: 110;
+    /* زیر دکمه، بالای محتوا */
+  }
+
+  .site-nav.open {
+    display: grid;
+  }
+
+  /* لمس/فوکوس بهتر آیتم‌ها */
+  .site-nav .nav-link,
+  .site-nav .btn-ghost {
+    padding: 10px 12px;
+    border-radius: 10px;
+  }
+
+  .site-nav .nav-link:focus-visible,
+  .nav-toggle:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+}
+
+/* موبایل باریک‌تر: کمی فشرده‌تر */
+@media (max-width: 560px) {
+  .site-header .nav-toggle {
+    width: 32px;
+    height: 30px;
+    border-radius: 8px;
+  }
+
+  .site-header .nav-toggle svg {
+    width: 15px;
+    height: 15px;
+  }
+}
+
+
+/* Footer */
+.site-footer {
+  margin-top: 16px;
+  border-top: 1px solid var(--panel-border);
+  background: var(--surface);
+  bottom: 0;
+  z-index: 10;
+}
+
+.site-footer .site-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding-block: 12px;
+  font-size: 14px;
+}
+
+.site-footer a {
+  color: #333;
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  text-decoration: underline;
+}
+
+.site-footer .dot {
+  opacity: .5;
+  margin-inline: 6px;
+}
+
+/* Back-to-top – animated & accessible */
+.to-top {
+  margin-left: 10px;
+  border: 1px solid var(--btn-border);
+  background: var(--btn-neutral);
+  border-radius: 10px;
+  padding: 6px 9px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+  transition: opacity .22s ease, transform .22s ease;
+}
+
+.to-top.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.to-top:hover {
+  background: #e7ebf3;
+}
+
+/* Ripple feedback on click */
+@keyframes ripple {
+  from {
+    transform: scale(0);
+    opacity: .3;
+  }
+
+  to {
+    transform: scale(10);
+    opacity: 0;
+  }
+}
+
+.to-top.rippling::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: currentColor;
+  animation: ripple .36s ease-out;
+}
+
+@media (max-width: 560px) {
+  .nav-toggle {
+    width: 32px;
+    height: 32px;
+  }
+
+  .nav-toggle svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* Print/Export safety */
+@media print {
+
+  .site-header,
+  .site-footer {
+    display: none !important;
+  }
+}
+
+html.exporting .site-header,
+html.exporting .site-footer {
+  display: none !important;
 }

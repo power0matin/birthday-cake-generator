@@ -65,7 +65,28 @@
   </script>
 </head>
 
+<!-- ===================== Site Header ===================== -->
+<header class="site-header hide-on-export" role="banner">
+  <div class="site-container">
+    <a class="site-brand" href="./">🍰 Cake/Exam Poster</a>
 
+    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
+      <span class="visually-hidden">Open menu</span>
+      <!-- 3-line icon -->
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      </svg>
+    </button>
+
+    <nav id="site-nav" class="site-nav" aria-label="Primary">
+      <a class="nav-link" href="./index.html">Birthday</a>
+      <a class="nav-link" href="./school.html">Exam</a>
+      <a class="nav-link" href="#" data-scroll="#sheet">Preview</a>
+      <a class="btn-ghost" href="https://github.com/power0matin/birthday-cake-generator" target="_blank"
+        rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</header>
 
 <body>
   <div class="app">
@@ -203,6 +224,24 @@
       </section>
     </main>
   </div>
+  <!-- ===================== Site Footer ===================== -->
+  <footer class="site-footer hide-on-export" role="contentinfo">
+    <div class="site-container">
+      <div class="foot-left">
+        © <span id="site-year"></span> power0matin · <a href="LICENSE">MIT</a>
+      </div>
+      <div class="foot-right">
+        <a href="https://github.com/power0matin/birthday-cake-generator/blob/main/CHANGELOG.md">Changelog</a>
+        <span class="dot">·</span>
+        <a href="https://github.com/power0matin/birthday-cake-generator/blob/main/README.md">EN</a>
+        <span class="dot">·</span>
+        <a href="https://github.com/power0matin/birthday-cake-generator/blob/main/README.fa.md">FA</a>
+        <button id="back-to-top" class="to-top" aria-label="Back to top">↑</button>
+      </div>
+    </div>
+  </footer>
+  <script defer src="site-shell.js"></script>
 </body>
+
 
 </html>
