@@ -2,7 +2,7 @@ name: Refresh live screenshot
 
 on:
   schedule:
-    - cron: "*/60 * * * *" # Every 60 minutes
+    - cron: "*/720 * * * *" # Every 720 minutes
   workflow_dispatch: {}
   push:
     paths:
