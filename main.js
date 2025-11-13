@@ -326,12 +326,50 @@ function loadDefaults() {
   setPickers(defaults.colors);
   applyInputs();
 }
+function smoothScrollToTopSpring() {
+  const start = scrollY,
+    startTime = performance.now();
+  const duration = 2000; // ms
+  const easeOutBack = (t) => {
+    const c = 1.10158;
+    return 1 + c * Math.pow(t - 1, 3) + Math.pow(t - 1, 2);
+  };
+  function frame(now) {
+    const p = Math.min(1, (now - startTime) / duration);
+    const y = start * (1 - easeOutBack(p));
+    scrollTo({ top: y });
+    if (p < 1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+document.getElementById("back-to-top")?.addEventListener("click", (e) => {
+  e.preventDefault();
+  smoothScrollToTopSpring();
+});
+const foot = document.querySelector(".site-footer");
+if ("IntersectionObserver" in window && foot) {
+  new IntersectionObserver(
+    ([e]) => {
+      if (e.isIntersecting) foot.classList.add("is-visible");
+    },
+    { threshold: 0.05 }
+  ).observe(foot);
+}
 
 // ---------- FIT: adaptive by font-size (no transform) ----------
 function fitCodeByFont() {
   const card = document.querySelector(".code-card");
   const pre = card?.querySelector("pre");
   if (!card || !pre) return () => {};
+  if (card) {
+    const onScroll = () => {
+      const end =
+        Math.ceil(card.scrollTop + card.clientHeight) >= card.scrollHeight;
+      card.classList.toggle("is-scrolled-to-end", end);
+    };
+    card.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
 
   // اندازه‌ی داخلی کارت
   const cardStyle = getComputedStyle(card);
@@ -588,6 +626,14 @@ function bind() {
         setTimeout(() => (els.btnShare.textContent = "Share Link"), 1200);
       }
     };
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest(".btn--ripple");
+    if (!b) return;
+    b.classList.remove("is-rippling");
+    void b.offsetWidth; // restart
+    b.classList.add("is-rippling");
+    setTimeout(() => b.classList.remove("is-rippling"), 420);
+  });
 
   // ---- Avatar / Logo handlers (final, optimized) ----
   (() => {
@@ -639,6 +685,7 @@ function bind() {
       const url = URL.createObjectURL(file);
       els.avatar.src = url;
       els.avatar.dataset.url = url;
+      els.avatar.classList.add("is-visible");
       els.avatar.style.display = "";
       setHint(file.name || "Click or drop an image");
       setHideSwitchEnabled(true);
@@ -647,6 +694,7 @@ function bind() {
 
     const clearAvatar = () => {
       if (!els.avatar) return;
+      els.avatar.classList.remove("is-visible");
       revokeAvatarURL();
       els.avatar.removeAttribute("src");
       els.avatar.style.display = "none";
@@ -718,6 +766,7 @@ function bind() {
     const hasAvatar = !!(els.avatar && els.avatar.src);
     setHideSwitchEnabled(hasAvatar);
     syncAvatarHideClass();
+    if (hasAvatar) els.avatar.classList.add("is-visible");
   })();
 
   if (els.btnResetColors)

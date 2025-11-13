@@ -52,6 +52,19 @@
       });
     }
 
+    let lastY = 0;
+    addEventListener(
+      "scroll",
+      () => {
+        const y = scrollY;
+        document
+          .querySelector(".site-header")
+          ?.classList.toggle("is-compact", y > 24 && y > lastY);
+        lastY = y;
+      },
+      { passive: true }
+    );
+
     // back-to-top
     const toTopBtn = document.getElementById("back-to-top");
     if (toTopBtn) {
