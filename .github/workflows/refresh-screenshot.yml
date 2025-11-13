@@ -2,7 +2,7 @@ name: Refresh live screenshot
 
 on:
   schedule:
-    - cron: "*/15 * * * *"   # هر 15 دقیقه
+    - cron: "*/60 * * * *" # Every 60 minutes
   workflow_dispatch: {}
   push:
     paths:
@@ -24,7 +24,7 @@ jobs:
       OUTPUT_PATH: "assets/birthday-cake-preview.png"
       VIEWPORT_WIDTH: "1920"
       VIEWPORT_HEIGHT: "1080"
-      DEVICE_SCALE_FACTOR: "2"     # اگر شارپ‌تر خواستی 2 کن (حجم فایل بیشتر می‌شود)
+      DEVICE_SCALE_FACTOR: "2" # اگر شارپ‌تر خواستی 2 کن (حجم فایل بیشتر می‌شود)
       WAIT_MS: "1500"
       NAV_TIMEOUT_MS: "45000"
       RETRIES: "3"
@@ -136,13 +136,9 @@ jobs:
           echo "File size: $BYTES bytes"
           test "$BYTES" -ge 20000
 
-      - name: Commit only if changed
+      - name: Commit screenshot
         shell: bash
         run: |
-          if git diff --quiet -- "$OUTPUT_PATH"; then
-            echo "No changes to commit."
-            exit 0
-          fi
           git config --global user.name  "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add "$OUTPUT_PATH"
