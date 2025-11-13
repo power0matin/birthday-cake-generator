@@ -74,6 +74,12 @@
   }
 }
 
+:lang(fa) {
+  line-height: 1.95;
+  word-spacing: .2px;
+  letter-spacing: 0;
+}
+
 /* ========== Export-only (html.exporting روی <html>) ========== */
 html.exporting .panel {
   display: none !important;
@@ -162,7 +168,10 @@ body {
   margin: 0;
   background: var(--app-bg);
   color: var(--ink);
-  font-family: "JetBrains Mono", "Fira Code", monospace;
+  font-family:
+    "Vazirmatn",
+    "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular,
+    Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -436,6 +445,8 @@ pre {
   max-width: 100%;
   overflow: visible;
   max-height: none;
+  font-family: "Fira Code", ui-monospace, SFMono-Regular,
+    Menlo, Monaco, Consolas, "Liberation Mono", monospace, "Vazirmatn";
 }
 
 .sheet .kw {
@@ -640,10 +651,11 @@ pre {
     outline: 3px solid #c8d0dc
   }
 
-  زز 100% {
+  100% {
     outline: 0
   }
 }
+
 
 .btn-danger:hover {
   background: #ffe9e9;
@@ -669,9 +681,10 @@ pre {
   transform: scale(1);
 }
 
-js Copy code html.exporting .hide-on-export {
+html.exporting .hide-on-export {
   display: none !important;
 }
+
 
 /* Hide on real print */
 @media print {
