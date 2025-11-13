@@ -144,3 +144,10 @@ jobs:
           git add "$OUTPUT_PATH"
           git commit -m "chore: refresh live screenshot (1920x1080)"
           git push
+          
+      - name: Commit only if changed
+        run: |
+          git fetch
+          git switch screenshots   # <── این خط مهم است
+          ...
+          git push origin screenshots
