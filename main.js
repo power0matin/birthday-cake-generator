@@ -453,20 +453,20 @@ async function savePNG() {
     alert("Image exporter not loaded yet. Please try again in a second.");
     return;
   }
-
-  await withExportStyles(async () => {
-    const bg = getComputedStyle(els.sheet).backgroundColor || "#ffffff";
-
-    const dataUrl = await window.htmlToImage.toPng(els.sheet, {
-      pixelRatio: 2,
-      cacheBust: true,
-      backgroundColor: bg,
-      skipFonts: true,
-      skipExternalStyles: true,
+  try {
+    await withExportStyles(async () => {
+      const bg = getComputedStyle(els.sheet).backgroundColor || "#ffffff";
+      const dataUrl = await window.htmlToImage.toPng(els.sheet, {
+        pixelRatio: 2,
+        cacheBust: true,
+        backgroundColor: bg,
+      });
+      download(dataUrl, `${cfg.filenamePrefix}-${Date.now()}.png`);
     });
-
-    download(dataUrl, `${cfg.filenamePrefix}-${Date.now()}.png`);
-  });
+  } catch (err) {
+    console.error("Failed to save PNG:", err);
+    alert("Failed to save PNG. See console for details.");
+  }
 }
 
 async function savePDF() {
@@ -475,38 +475,29 @@ async function savePDF() {
     alert("PDF exporter not ready yet. Try again shortly.");
     return;
   }
-
-  await withExportStyles(async () => {
-    const bg = getComputedStyle(els.sheet).backgroundColor || "#ffffff";
-
-    const dataUrl = await window.htmlToImage.toPng(els.sheet, {
-      pixelRatio: 2,
-      cacheBust: true,
-      backgroundColor: bg,
-      skipFonts: true,
-      skipExternalStyles: true,
+  try {
+    await withExportStyles(async () => {
+      const bg = getComputedStyle(els.sheet).backgroundColor || "#ffffff";
+      const dataUrl = await window.htmlToImage.toPng(els.sheet, {
+        pixelRatio: 2,
+        cacheBust: true,
+        backgroundColor: bg,
+      });
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4",
+      });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      pdf.addImage(dataUrl, "PNG", 0, 0, pageW, pageH, undefined, "FAST");
+      pdf.save(`${cfg.filenamePrefix}-${Date.now()}.pdf`);
     });
-
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({
-      orientation: "landscape",
-      unit: "mm",
-      format: "a4",
-    });
-
-    pdf.addImage(
-      dataUrl,
-      "PNG",
-      0,
-      0,
-      pdf.internal.pageSize.getWidth(),
-      pdf.internal.pageSize.getHeight(),
-      undefined,
-      "FAST"
-    );
-
-    pdf.save(`${cfg.filenamePrefix}-${Date.now()}.pdf`);
-  });
+  } catch (err) {
+    console.error("Failed to save PDF:", err);
+    alert("Failed to save PDF. See console for details.");
+  }
 }
 
 // ---------- print: fit before/after ----------
