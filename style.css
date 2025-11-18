@@ -75,6 +75,7 @@
 }
 
 :lang(fa) {
+  font-family: "Vazirmatn", sans-serif !important;
   line-height: 1.95;
   word-spacing: .2px;
   letter-spacing: 0;
