@@ -168,6 +168,15 @@ docs: update README with URL params
 
 Built with ❤️ by [power0matin](https://github.com/power0matin) · Font: [JetBrains Mono](https://fonts.google.com/specimen/JetBrains+Mono)
 
+## 📬 Contact
+
+**Matin Shahabadi (متین شاه‌آبادی / متین شاه آبادی)**
+
+* Website: [matinshahabadi.ir](https://matinshahabadi.ir)
+* Email: [me@matinshahabadi.ir](mailto:me@matinshahabadi.ir)
+* GitHub: [power0matin](https://github.com/power0matin)
+* LinkedIn: [matin-shahabadi](https://www.linkedin.com/in/matin-shahabadi)
+
 ## 🧾 Changelog
 
 See **[CHANGELOG.md](./CHANGELOG.md)** for release notes (Keep a Changelog + SemVer).
