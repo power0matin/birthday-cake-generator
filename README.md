@@ -174,6 +174,15 @@ docs: update README with URL params
 
 Built with ❤️ by [power0matin](https://github.com/power0matin) · Fonts: [Inter](https://fonts.google.com/specimen/Inter), [Fira Code](https://fonts.google.com/specimen/Fira+Code), [Vazirmatn](https://fonts.google.com/specimen/Vazirmatn)
 
+## 📬 Contact
+
+**Matin Shahabadi (متین شاه‌آبادی / متین شاه آبادی)**
+
+* Website: [matinshahabadi.ir](https://matinshahabadi.ir)
+* Email: [me@matinshahabadi.ir](mailto:me@matinshahabadi.ir)
+* GitHub: [power0matin](https://github.com/power0matin)
+* LinkedIn: [matin-shahabadi](https://www.linkedin.com/in/matin-shahabadi)
+
 ## 🧾 Changelog
 
 See **[CHANGELOG.md](./CHANGELOG.md)** for release notes (Keep a Changelog + SemVer).

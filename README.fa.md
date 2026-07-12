@@ -164,9 +164,14 @@ docs: update README with URL params
 
 **MIT** — آزاد برای استفاده و تغییر.
 
-## 🙌 سازنده
+## 📬 ارتباط با من
 
-ساخته‌شده با ❤️ توسط [power0matin](https://github.com/power0matin) · فونت‌ها: [Inter](https://fonts.google.com/specimen/Inter)، [Fira Code](https://fonts.google.com/specimen/Fira+Code)، [Vazirmatn](https://fonts.google.com/specimen/Vazirmatn)
+**Matin Shahabadi (متین شاه‌آبادی / متین شاه آبادی)**
+
+ وب‌سایت: [matinshahabadi.ir](https://matinshahabadi.ir)
+* ایمیل: [me@matinshahabadi.ir](mailto:me@matinshahabadi.ir)
+* گیت‌هاب: [power0matin](https://github.com/power0matin)
+* لینکدین: [matin-shahabadi](https://www.linkedin.com/in/matin-shahabadi)
 
 ## 🧾 تغییرات
 
