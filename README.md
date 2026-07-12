@@ -139,13 +139,13 @@ Open the URL to restore the same configuration.
 - **Print**: `@page` rules; panel hidden; safe margins
 - **Typography**: Inter (UI), Fira Code (code blocks), Vazirmatn (Persian)
 - **Design**: Glass morphism panel, environmental lighting system, multi-layered shadows
-- **Resilience**: guards if libs aren’t loaded yet; ObjectURL revocation; pre-print sync
+- **Resilience**: guards if libs aren't loaded yet; ObjectURL revocation; pre-print sync
 
 ## ♿ Accessibility
 
 - Labeled controls, keyboard-focusable switch
 - **prefers-reduced-motion** support (animations and hover transforms disabled)
-- SVGs in poster use ole="img" with ria-label for screen readers
+- SVGs in poster use `role="img"` with `aria-label` for screen readers
 - Focus-visible states on all interactive elements
 - Color contrast depends on theme (consider a high-contrast preset)
 
