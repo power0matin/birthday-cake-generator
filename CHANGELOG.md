@@ -7,13 +7,43 @@ Commit messages follow **[Conventional Commits](https://www.conventionalcommits.
 
 ## [Unreleased]
 
-### Planned
+### Added
 
-- Presets: Pastel / Neon / Solarized
-- Avatar shape toggle (circle / rounded-square)
-- Big countdown overlay for Exam mode
-- PWA (Add to Home Screen)
-- High-contrast accessibility theme
+- **Fonts:** Added Inter (UI) and Fira Code (code blocks) via single optimized Google Fonts request.
+- **SEO:** Added `hreflang` tags, `sitemap.xml`, improved meta descriptions, enhanced JSON-LD structured data with `author` and `sameAs`.
+- **Accessibility:** Added `role="img"` to poster header SVGs for proper screen reader support.
+- **Accessibility:** Added `prefers-reduced-motion` support — all CSS animations and hover transforms are disabled for users who prefer reduced motion.
+- **Navbar:** Redesigned with brand icon + text, active page indicator (green underline), hamburger/close icon toggle, and dedicated GitHub button with inline SVG icon.
+- **Stage lighting:** Environmental lighting system with ambient radial glow (`::before`), atmospheric shadow (`stage-shadow` div), and multi-layered contact/lift shadows on the poster.
+- **Footer:** Always visible with `margin-top: auto` flex layout; added gradient separator line and improved backdrop blur.
+- **Sitemap:** Added `sitemap.xml` for search engine indexing.
+
+### Changed
+
+- **HTML structure:** Moved `<header>` inside `<body>` (was invalid HTML5 — header was a direct child of `<html>` before `<body>`).
+- **CSS design system:** Complete redesign with design tokens (`--r-*`, `--sp-*`, `--shadow-*`), glass morphism panel, refined form controls, and premium button styles.
+- **Typography:** Replaced JetBrains Mono with Fira Code; added Inter as primary UI font; consolidated all fonts into one request.
+- **Layout:** Grid-based layout with sticky sidebar, centered poster preview, and responsive breakpoints (1100px, 980px, 780px, 680px, 560px, 420px).
+- **Button transitions:** Scoped `transition: all 0.15s ease` to UI controls only (`.panel button`, `.btn-github`, `.nav-toggle`, `.to-top`) — no longer leaks into poster internals.
+- **Animation fill-mode:** Changed from `both` to `backwards` on `.panel` and `.sheet` animations — fixes hover transform being blocked by persistent animation fill.
+- **Scroll behavior:** Removed `scroll-behavior: smooth` from `html` — was conflicting with the custom JS back-to-top spring animation.
+- **CSS cleanup:** Removed 6 unused variables (`--accent`, `--brand-light`, `--brand-glow`, `--shadow-sheet`, `--shadow-xl`, `--shadow-md`, `--surface-glass`). Removed duplicate `.sheet` declaration, redundant `padding-bottom`, and redundant `align-self` rules.
+- **JS refactoring:** Extracted `debounce()` to module scope; consolidated `syncURL`/`makeShareURL` via shared `buildShareParams()`; extracted avatar logic into `initAvatar()`; extracted color presets into `PRESETS` object; removed duplicate back-to-top handler.
+- **JS scroll listener leak:** `fitCodeByFont()` now properly removes its scroll event listener on cleanup.
+- **Export/Print:** All decorative effects (ambient glow, atmospheric shadow, sheet shadow) are automatically removed during PNG/PDF export and print.
+- **Site shell:** Updated `site-shell.js` to handle hamburger/close icon toggle via `.is-open` class.
+- **Meta descriptions:** Updated to English for both pages (were previously in Persian only).
+
+### Fixed
+
+- **Horizontal scrollbar:** `.stage-wrap::before` with `inset: -20%` was extending beyond the viewport. Fixed by adding `overflow: hidden` to `.stage-wrap` with reduced inset on mobile.
+- **Space below footer:** `body { min-height: 100vh }` was forcing the body to fill the viewport, creating dead space below the footer. Removed `min-height` — footer now sits naturally via flex layout.
+- **Animation hover bug:** `.sheet { animation: ... both }` prevented `.sheet:hover { transform }` from ever working. Changed to `backwards` fill-mode.
+- **Scroll conflict:** `scroll-behavior: smooth` on `html` interfered with the custom `requestAnimationFrame` back-to-top animation. Removed from global styles.
+- **Scroll listener leak:** `fitCodeByFont()` added a scroll listener on every call but never removed it. Now properly cleaned up.
+- **Duplicate `.sheet` CSS:** Two `.sheet` blocks existed (main + animation). Merged into one.
+- **Missing `.hint` class:** HTML referenced `class="hint"` but CSS had no rule for it. Added.
+- **Print overflow:** `.stage-wrap` now gets `overflow: visible !important` in print styles to ensure poster renders correctly.
 
 ## [1.1.0] - 2025-11-12
 

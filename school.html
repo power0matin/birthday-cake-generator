@@ -7,9 +7,13 @@
   <title>Exam Motivational Poster — A4 Landscape Generator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description"
-    content="پوستر انگیزشی کنکور در سایز A4 (افقی) با شخصی‌سازی نام، یوزرنیم و تاریخ آزمون؛ خروجی سریع PNG و PDF." />
+    content="Create a free A4 landscape exam motivational poster with custom name, username, exam date &amp; colors. Export as PNG or PDF instantly." />
   <meta name="robots" content="index,follow" />
   <link rel="canonical" href="https://power0matin.github.io/birthday-cake-generator/school.html" />
+  <link rel="alternate" hreflang="en" href="https://power0matin.github.io/birthday-cake-generator/school.html" />
+  <link rel="alternate" hreflang="fa" href="https://power0matin.github.io/birthday-cake-generator/school.html#fa" />
+  <link rel="alternate" hreflang="x-default" href="https://power0matin.github.io/birthday-cake-generator/school.html" />
+  <link rel="sitemap" type="application/xml" href="sitemap.xml" />
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="512x512" href="images/birthday-cake.png" />
@@ -17,12 +21,7 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <!-- Mono Font for Code -->
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet">
-
-  <!-- Main Persian Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&family=Vazirmatn:wght@300..900&display=swap" rel="stylesheet">
 
   <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
@@ -47,14 +46,14 @@
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:image:type" content="image/jpeg" />
-  <meta property="og:image:alt" content="Preview of the A4 exam motivational poster" />
+  <meta property="og:image:alt" content="A4 exam motivational poster with Python code style, customizable name and countdown" />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Exam Motivational Poster — A4 Landscape Generator" />
   <meta name="twitter:description" content="Customize and export a beautiful A4 exam poster." />
   <meta name="twitter:image" content="images/cover.jpg" />
 
-  <!-- Structured Data -->
+  <!-- Structured Data (JSON-LD) -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
@@ -65,34 +64,46 @@
     "applicationCategory":"DesignApplication",
     "operatingSystem":"Web",
     "image":"images/cover.jpg",
-    "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}
+    "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+    "author":{"@type":"Person","name":"Matin Shahabadi","url":"https://github.com/power0matin"},
+    "sameAs":["https://github.com/power0matin/birthday-cake-generator"]
   }
   </script>
 </head>
-<!-- ===================== Site Header ===================== -->
-<header class="site-header hide-on-export" role="banner">
-  <div class="site-container">
-    <a class="site-brand" href="./">🍰 Cake/Exam Poster</a>
-
-    <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
-      <span class="visually-hidden">Open menu</span>
-      <!-- 3-line icon -->
-      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-      </svg>
-    </button>
-
-    <nav id="site-nav" class="site-nav" aria-label="Primary">
-      <a class="nav-link" href="./index.html">Birthday</a>
-      <a class="nav-link" href="./school.html">Exam</a>
-      <a class="nav-link" href="#" data-scroll="#sheet">Preview</a>
-      <a class="btn-ghost" href="https://github.com/power0matin/birthday-cake-generator" target="_blank"
-        rel="noopener">GitHub</a>
-    </nav>
-  </div>
-</header>
 
 <body>
+  <!-- ===================== Site Header ===================== -->
+  <header class="site-header hide-on-export" role="banner">
+    <div class="site-container">
+      <a class="site-brand" href="./">
+        <span class="brand-icon">🍰</span>
+        <span class="brand-text">Cake Poster</span>
+      </a>
+
+      <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">
+        <span class="visually-hidden">Open menu</span>
+        <svg class="icon-menu" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+        <svg class="icon-close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+
+      <nav id="site-nav" class="site-nav" aria-label="Primary">
+        <a class="nav-link" href="./index.html">Birthday</a>
+        <a class="nav-link active" href="./school.html">Exam</a>
+        <a class="nav-link" href="#" data-scroll="#sheet">Preview</a>
+        <a class="btn-github" href="https://github.com/power0matin/birthday-cake-generator" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.73 0 8.33c0 3.68 2.29 6.79 5.47 7.89.4.08.55-.18.55-.39 0-.19-.01-.82-.01-1.49-2.01.38-2.53-.51-2.69-.98-.09-.24-.48-.98-.82-1.18-.28-.15-.68-.52-.01-.53.63-.01 1.08.61 1.23.86.72 1.22 1.87.87 2.33.66.07-.53.28-.87.51-1.07-1.78-.21-3.64-.92-3.64-4.1 0-.91.31-1.66.82-2.25-.08-.2-.36-1.03.08-2.15 0 0 .67-.22 2.2.86.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.08 2.2-.86 2.2-.86.44 1.12.16 1.95.08 2.15.51.59.82 1.34.82 2.25 0 3.19-1.87 3.88-3.65 4.09.29.26.54.77.54 1.56 0 1.12-.01 2.02-.01 2.29 0 .21.15.47.55.39A8.33 8.33 0 0 0 16 8.33C16 3.73 12.42 0 8 0z"/></svg>
+          GitHub
+        </a>
+      </nav>
+    </div>
+  </header>
   <div class="app">
     <aside class="panel">
       <h1>Settings</h1>
@@ -174,6 +185,7 @@
     </aside>
 
     <main class="stage-wrap">
+      <div class="stage-shadow"></div>
       <section id="sheet" class="sheet" role="img" aria-label="A4 Exam Poster" data-date-label="Exam Day"
         data-default-name="Your Name" data-default-username="@username" data-default-date="2026-06-30"
         data-filename-prefix="school-poster" data-theme-key="school_theme_v1">
@@ -183,11 +195,11 @@
             <div class="tag" id="out-name">Your&nbsp;Name</div>
           </div>
           <div class="icons">
-            <svg class="icon" viewBox="0 0 16 16" aria-label="GitHub">
+            <svg class="icon" viewBox="0 0 16 16" role="img" aria-label="GitHub">
               <path fill="#000"
                 d="M8 0C3.58 0 0 3.73 0 8.33c0 3.68 2.29 6.79 5.47 7.89.4.08.55-.18.55-.39 0-.19-.01-.82-.01-1.49-2.01.38-2.53-.51-2.69-.98-.09-.24-.48-.98-.82-1.18-.28-.15-.68-.52-.01-.53.63-.01 1.08.61 1.23.86.72 1.22 1.87.87 2.33.66.07-.53.28-.87.51-1.07-1.78-.21-3.64-.92-3.64-4.1 0-.91.31-1.66.82-2.25-.08-.2-.36-1.03.08-2.15 0 0 .67-.22 2.2.86.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.08 2.2-.86 2.2-.86.44 1.12.16 1.95.08 2.15.51.59.82 1.34.82 2.25 0 3.19-1.87 3.88-3.65 4.09.29.26.54.77.54 1.56 0 1.12-.01 2.02-.01 2.29 0 .21.15.47.55.39A8.33 8.33 0 0 0 16 8.33C16 3.73 12.42 0 8 0z" />
             </svg>
-            <svg class="icon" viewBox="0 0 24 24" aria-label="Code">
+            <svg class="icon" viewBox="0 0 24 24" role="img" aria-label="Code">
               <path fill="#2e7d32"
                 d="M8.7 16.7 4 12l4.7-4.7 1.4 1.4L6.8 12l3.3 3.3-1.4 1.4zm6.6 0-1.4-1.4 3.3-3.3-3.3-3.3 1.4-1.4L20 12l-4.7 4.7zM9.8 19l-1.9-.6L14.2 5l1.9.6z" />
             </svg>

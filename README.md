@@ -53,8 +53,10 @@ A free, offline, zero-build tool to create **print-ready A4 landscape posters** 
 .
 ├─ index.html          # Birthday poster
 ├─ school.html         # Exam poster
-├─ style.css           # UI + print/export styles
+├─ style.css           # Design system + print/export styles
 ├─ main.js             # App logic
+├─ site-shell.js       # Header, mobile menu, back-to-top
+├─ sitemap.xml         # Search engine sitemap
 └─ assets/
    └─ birthday-cake-preview.png
 ```
@@ -135,12 +137,16 @@ Open the URL to restore the same configuration.
 
 - **Export**: `html-to-image` (PNG), `jsPDF` (A4 landscape)
 - **Print**: `@page` rules; panel hidden; safe margins
-- **Typography**: JetBrains Mono
+- **Typography**: Inter (UI), Fira Code (code blocks), Vazirmatn (Persian)
+- **Design**: Glass morphism panel, environmental lighting system, multi-layered shadows
 - **Resilience**: guards if libs aren’t loaded yet; ObjectURL revocation; pre-print sync
 
 ## ♿ Accessibility
 
 - Labeled controls, keyboard-focusable switch
+- **prefers-reduced-motion** support (animations and hover transforms disabled)
+- SVGs in poster use ole="img" with ria-label for screen readers
+- Focus-visible states on all interactive elements
 - Color contrast depends on theme (consider a high-contrast preset)
 
 ## 🤝 Contributing
@@ -166,7 +172,7 @@ docs: update README with URL params
 
 ## 🙌 Credits
 
-Built with ❤️ by [power0matin](https://github.com/power0matin) · Font: [JetBrains Mono](https://fonts.google.com/specimen/JetBrains+Mono)
+Built with ❤️ by [power0matin](https://github.com/power0matin) · Fonts: [Inter](https://fonts.google.com/specimen/Inter), [Fira Code](https://fonts.google.com/specimen/Fira+Code), [Vazirmatn](https://fonts.google.com/specimen/Vazirmatn)
 
 ## 🧾 Changelog
 

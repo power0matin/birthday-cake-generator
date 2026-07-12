@@ -1,6 +1,5 @@
 // main.js — auto-config across pages (birthday, school, and future)
 
-// ---------- tiny helpers ----------
 const $ = (sel) => document.querySelector(sel);
 
 const els = {
@@ -47,7 +46,7 @@ const els = {
   inpImportTheme: $("#inp-import-theme"),
 };
 
-// ---------- configuration via <section id="sheet" data-*> ----------
+// Page configuration via <section id="sheet" data-*>
 const dataset = els.sheet?.dataset || {};
 const cfg = {
   dateLabel: dataset.dateLabel || "Birthday",
@@ -65,27 +64,29 @@ const cfg = {
       : "birthday"),
 };
 
-// ---------- defaults ----------
+const DEFAULT_COLORS = {
+  bg: "#ffffff",
+  ink: "#222222",
+  kw: "#ff5722",
+  mod: "#8e24aa",
+  func: "#2e7d32",
+  str: "#1565c0",
+  num: "#d32f2f",
+  border: "#e0e0e0",
+  codebg: "#fafafa",
+  punct: "#444444",
+};
+
 const defaults = {
   name: cfg.defaultName,
   username: cfg.defaultUsername,
   birthday: cfg.defaultDate,
-  colors: {
-    bg: "#ffffff",
-    ink: "#222222",
-    kw: "#ff5722",
-    mod: "#8e24aa",
-    func: "#2e7d32",
-    str: "#1565c0",
-    num: "#d32f2f",
-    border: "#e0e0e0",
-    codebg: "#fafafa",
-    punct: "#444444",
-  },
+  colors: { ...DEFAULT_COLORS },
 };
+
 let THEME_KEY = cfg.themeKey;
 
-// reflect date label in UI
+// Reflect date label in UI
 (function syncDateLabel() {
   if (!els.birthday) return;
   const label = els.birthday.closest("label");
@@ -96,33 +97,37 @@ let THEME_KEY = cfg.themeKey;
   }
 })();
 
-// ---------- CSS var ops ----------
+// ---------- CSS variable helpers ----------
+
 function setCSSVars(colors, scope = els.sheet) {
   if (!scope) return;
   Object.entries(colors).forEach(([k, v]) =>
     scope.style.setProperty(`--${k}`, v)
   );
 }
+
 function applyTheme(colors) {
   if (!els.sheet) return;
   const { ink, ...rest } = colors;
   setCSSVars(rest, document.documentElement);
   setCSSVars(colors, els.sheet);
 }
+
 function getPickerColors() {
   return {
-    bg: els.clrBg?.value || defaults.colors.bg,
-    ink: els.clrInk?.value || defaults.colors.ink,
-    kw: els.clrKw?.value || defaults.colors.kw,
-    mod: els.clrMod?.value || defaults.colors.mod,
-    func: els.clrFunc?.value || defaults.colors.func,
-    str: els.clrStr?.value || defaults.colors.str,
-    num: els.clrNum?.value || defaults.colors.num,
-    border: els.clrBorder?.value || defaults.colors.border,
-    codebg: els.clrCodeBg?.value || defaults.colors.codebg,
-    punct: els.clrPunct?.value || defaults.colors.punct,
+    bg: els.clrBg?.value || DEFAULT_COLORS.bg,
+    ink: els.clrInk?.value || DEFAULT_COLORS.ink,
+    kw: els.clrKw?.value || DEFAULT_COLORS.kw,
+    mod: els.clrMod?.value || DEFAULT_COLORS.mod,
+    func: els.clrFunc?.value || DEFAULT_COLORS.func,
+    str: els.clrStr?.value || DEFAULT_COLORS.str,
+    num: els.clrNum?.value || DEFAULT_COLORS.num,
+    border: els.clrBorder?.value || DEFAULT_COLORS.border,
+    codebg: els.clrCodeBg?.value || DEFAULT_COLORS.codebg,
+    punct: els.clrPunct?.value || DEFAULT_COLORS.punct,
   };
 }
+
 function setPickers(c) {
   if (!c) return;
   if (els.clrBg) els.clrBg.value = c.bg;
@@ -136,13 +141,16 @@ function setPickers(c) {
   if (els.clrCodeBg) els.clrCodeBg.value = c.codebg;
   if (els.clrPunct) els.clrPunct.value = c.punct;
 }
+
 function applyThemeFromPickers() {
   applyTheme(getPickerColors());
 }
-// ---------- shareable URL ----------
-function makeShareURL() {
+
+// ---------- Shareable URL ----------
+
+function buildShareParams() {
   const colors = getPickerColors();
-  const params = new URLSearchParams({
+  return new URLSearchParams({
     n: els.name?.value || "",
     u: els.username?.value || "",
     d: els.birthday?.value || "",
@@ -157,32 +165,30 @@ function makeShareURL() {
     codebg: colors.codebg,
     punct: colors.punct,
   });
-  return `${location.origin}${location.pathname}?${params.toString()}`;
+}
+
+function makeShareURL() {
+  return `${location.origin}${location.pathname}?${buildShareParams().toString()}`;
+}
+
+function syncURL() {
+  history.replaceState(null, "", `${location.pathname}?${buildShareParams().toString()}`);
 }
 
 function loadFromURL() {
   const p = new URLSearchParams(location.search);
   if ([...p.keys()].length === 0) return;
 
-  // ورودی‌های متن
   if (els.name) els.name.value = p.get("n") || els.name.value || "";
   if (els.username) els.username.value = p.get("u") || els.username.value || "";
   if (els.birthday) els.birthday.value = p.get("d") || els.birthday.value || "";
 
-  // رنگ‌ها
-  const c = {
-    bg: p.get("bg") || undefined,
-    ink: p.get("ink") || undefined,
-    kw: p.get("kw") || undefined,
-    mod: p.get("mod") || undefined,
-    func: p.get("func") || undefined,
-    str: p.get("str") || undefined,
-    num: p.get("num") || undefined,
-    border: p.get("border") || undefined,
-    codebg: p.get("codebg") || undefined,
-    punct: p.get("punct") || undefined,
-  };
-  Object.keys(c).forEach((k) => c[k] === undefined && delete c[k]);
+  const colorKeys = ["bg", "ink", "kw", "mod", "func", "str", "num", "border", "codebg", "punct"];
+  const c = {};
+  for (const k of colorKeys) {
+    const v = p.get(k);
+    if (v) c[k] = v;
+  }
   if (Object.keys(c).length) {
     setPickers({ ...getPickerColors(), ...c });
     applyThemeFromPickers();
@@ -190,7 +196,8 @@ function loadFromURL() {
   applyInputs();
 }
 
-// ---------- misc ----------
+// ---------- Utility helpers ----------
+
 function escapeHtml(s = "") {
   return String(s)
     .replace(/&/g, "&amp;")
@@ -199,6 +206,7 @@ function escapeHtml(s = "") {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 }
+
 function randHex() {
   return (
     "#" +
@@ -207,13 +215,12 @@ function randHex() {
       .padStart(6, "0")
   );
 }
+
 function randomPalette() {
   const light = Math.random() > 0.5;
-  const bg = light ? "#ffffff" : "#121212";
-  const ink = light ? "#111111" : "#f5f5f5";
   return {
-    bg,
-    ink,
+    bg: light ? "#ffffff" : "#121212",
+    ink: light ? "#111111" : "#f5f5f5",
     kw: randHex(),
     mod: randHex(),
     func: randHex(),
@@ -224,15 +231,28 @@ function randomPalette() {
     punct: light ? "#444444" : "#cccccc",
   };
 }
+
+function debounce(fn, ms = 80) {
+  let t;
+  return (...a) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...a), ms);
+  };
+}
+
+// ---------- Theme persistence ----------
+
 function copyCssVars(colors) {
   const css = `:root{\n  --bg:${colors.bg}; --ink:${colors.ink}; --kw:${colors.kw}; --mod:${colors.mod};\n  --func:${colors.func}; --str:${colors.str}; --num:${colors.num}; --border:${colors.border};\n  --codebg:${colors.codebg}; --punct:${colors.punct};\n}`;
   return navigator.clipboard?.writeText(css);
 }
+
 function saveTheme(c) {
   try {
     localStorage.setItem(THEME_KEY, JSON.stringify(c));
   } catch {}
 }
+
 function loadTheme() {
   try {
     return JSON.parse(localStorage.getItem(THEME_KEY) || "null");
@@ -241,25 +261,24 @@ function loadTheme() {
   }
 }
 
-// ---------- code templates ----------
+// ---------- Code templates ----------
+
 function updateCode(name, user, dateStr) {
-  let y = 2000,
-    m = 1,
-    d = 1;
+  let y = 2000, m = 1, d = 1;
   if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr))
     [y, m, d] = dateStr.split("-").map(Number);
   if (!els.code) return;
 
+  const safeName = escapeHtml(name);
+  const safeUser = escapeHtml(user);
+
   if (cfg.mode === "exam") {
-    els.code.innerHTML = `\n<span class="kw">from</span> <span class="mod">datetime</span> <span class="kw">import</span> <span class="mod">date</span>
+    els.code.innerHTML = `
+<span class="kw">from</span> <span class="mod">datetime</span> <span class="kw">import</span> <span class="mod">date</span>
 <span class="mod">today</span> <span class="kw">=</span> <span class="mod">date</span>.<span class="func">today</span>()
 
-<span class="mod">name</span> <span class="kw">=</span> <span class="str">"${escapeHtml(
-      name
-    )}"</span>
-<span class="mod">username</span> <span class="kw">=</span> <span class="str">"${escapeHtml(
-      user
-    )}"</span>
+<span class="mod">name</span> <span class="kw">=</span> <span class="str">"${safeName}"</span>
+<span class="mod">username</span> <span class="kw">=</span> <span class="str">"${safeUser}"</span>
 
 <span class="mod">exam_day</span> <span class="kw">=</span> <span class="mod">date</span>(<span class="num">${y}</span>, <span class="num">${m}</span>, <span class="num">${d}</span>)
 <span class="mod">days_left</span> <span class="kw">=</span> (<span class="mod">exam_day</span> <span class="kw">-</span> <span class="mod">today</span>).<span class="func">days</span>
@@ -281,15 +300,12 @@ function updateCode(name, user, dateStr) {
 
 <span class="func">print</span>(<span class="str">"🔥 تلاش امروزت = موفقیت فردایت."</span>)\n`;
   } else {
-    els.code.innerHTML = `\n<span class="kw">from</span> <span class="mod">datetime</span> <span class="kw">import</span> <span class="mod">date</span>
+    els.code.innerHTML = `
+<span class="kw">from</span> <span class="mod">datetime</span> <span class="kw">import</span> <span class="mod">date</span>
 <span class="mod">today</span> <span class="kw">=</span> <span class="mod">date</span>.<span class="func">today</span>()
 
-<span class="mod">name</span> <span class="kw">=</span> <span class="str">"${escapeHtml(
-      name
-    )}"</span>
-<span class="mod">username</span> <span class="kw">=</span> <span class="str">"${escapeHtml(
-      user
-    )}"</span>
+<span class="mod">name</span> <span class="kw">=</span> <span class="str">"${safeName}"</span>
+<span class="mod">username</span> <span class="kw">=</span> <span class="str">"${safeUser}"</span>
 
 <span class="mod">birthday</span> <span class="kw">=</span> <span class="mod">date</span>(<span class="num">${y}</span>, <span class="num">${m}</span>, <span class="num">${d}</span>)
 
@@ -308,7 +324,8 @@ function updateCode(name, user, dateStr) {
   }
 }
 
-// ---------- inputs sync ----------
+// ---------- Input sync ----------
+
 function applyInputs() {
   const name = (els.name?.value || "").trim() || defaults.name;
   const user = (els.username?.value || "").trim() || defaults.username;
@@ -318,6 +335,7 @@ function applyInputs() {
   if (els.outUser) els.outUser.textContent = user;
   updateCode(name, user, bday);
 }
+
 function loadDefaults() {
   if (els.name) els.name.value = defaults.name;
   if (els.username) els.username.value = defaults.username;
@@ -326,52 +344,23 @@ function loadDefaults() {
   setPickers(defaults.colors);
   applyInputs();
 }
-function smoothScrollToTopSpring() {
-  const start = scrollY,
-    startTime = performance.now();
-  const duration = 2000; // ms
-  const easeOutBack = (t) => {
-    const c = 1.10158;
-    return 1 + c * Math.pow(t - 1, 3) + Math.pow(t - 1, 2);
-  };
-  function frame(now) {
-    const p = Math.min(1, (now - startTime) / duration);
-    const y = start * (1 - easeOutBack(p));
-    scrollTo({ top: y });
-    if (p < 1) requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-}
-document.getElementById("back-to-top")?.addEventListener("click", (e) => {
-  e.preventDefault();
-  smoothScrollToTopSpring();
-});
-const foot = document.querySelector(".site-footer");
-if ("IntersectionObserver" in window && foot) {
-  new IntersectionObserver(
-    ([e]) => {
-      if (e.isIntersecting) foot.classList.add("is-visible");
-    },
-    { threshold: 0.05 }
-  ).observe(foot);
-}
 
-// ---------- FIT: adaptive by font-size (no transform) ----------
+// ---------- Adaptive font fitting for export ----------
+
 function fitCodeByFont() {
   const card = document.querySelector(".code-card");
   const pre = card?.querySelector("pre");
   if (!card || !pre) return () => {};
-  if (card) {
-    const onScroll = () => {
-      const end =
-        Math.ceil(card.scrollTop + card.clientHeight) >= card.scrollHeight;
-      card.classList.toggle("is-scrolled-to-end", end);
-    };
-    card.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-  }
 
-  // اندازه‌ی داخلی کارت
+  const onScroll = () => {
+    const atEnd = Math.ceil(card.scrollTop + card.clientHeight) >= card.scrollHeight;
+    card.classList.toggle("is-scrolled-to-end", atEnd);
+  };
+  card.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  const removeScroll = () => card.removeEventListener("scroll", onScroll);
+
   const cardStyle = getComputedStyle(card);
   const availW =
     card.clientWidth -
@@ -382,39 +371,36 @@ function fitCodeByFont() {
     parseFloat(cardStyle.paddingTop) -
     parseFloat(cardStyle.paddingBottom);
 
-  // اندازه های اولیه را نگه‌دار برای بازگردانی
   const prevSize = pre.style.fontSize || "";
   const prevLH = pre.style.lineHeight || "";
 
-  // شروع از اندازه‌ی فعلی محاسبه‌شده
   const cs = getComputedStyle(pre);
   let sizePx = parseFloat(cs.fontSize) || 16;
   let lineH = parseFloat(cs.lineHeight) || sizePx * 1.4;
 
-  pre.style.whiteSpace = "pre-wrap"; // خطوط شکسته شوند
+  pre.style.whiteSpace = "pre-wrap";
   pre.style.overflow = "visible";
   pre.style.maxHeight = "none";
 
-  // کاهش تطبیقی اندازه تا جا شود
   let guard = 120;
   while (guard-- > 0) {
-    // اگر جا شد، تمام
     if (pre.scrollHeight <= availH && pre.scrollWidth <= availW) break;
-    sizePx -= 0.5; // هر بار نیم‌پیکسل
-    if (sizePx < 9) break; // حداقل خوانایی
+    sizePx -= 0.5;
+    if (sizePx < 9) break;
     lineH = Math.max(sizePx * 1.35, 12);
     pre.style.fontSize = sizePx + "px";
     pre.style.lineHeight = lineH + "px";
   }
 
-  // تابع بازگردانی
   return () => {
     pre.style.fontSize = prevSize;
     pre.style.lineHeight = prevLH;
+    removeScroll();
   };
 }
 
-// ---------- export helpers ----------
+// ---------- Export helpers ----------
+
 function download(dataUrl, filename) {
   const a = document.createElement("a");
   a.href = dataUrl;
@@ -432,9 +418,7 @@ async function withExportStyles(run) {
     await document.fonts?.ready;
   } catch {}
 
-  // فیت تطبیقی
   const restore = fitCodeByFont();
-  // دو فریم برای پایدار شدن layout
   await new Promise((r) =>
     requestAnimationFrame(() => requestAnimationFrame(r))
   );
@@ -500,15 +484,16 @@ async function savePDF() {
   }
 }
 
-// ---------- print: fit before/after ----------
+// ---------- Print: fit before/after ----------
+
 window.addEventListener("beforeprint", () => {
   document.documentElement.classList.add("exporting");
-  // Failsafe for some browsers
   if (els.logoHideExport?.checked && els.avatar) {
     els.avatar.style.setProperty("display", "none", "important");
   }
   window.__restorePrintFit = fitCodeByFont();
 });
+
 window.addEventListener("afterprint", () => {
   document.documentElement.classList.remove("exporting");
   if (els.avatar) els.avatar.style.removeProperty("display");
@@ -518,113 +503,181 @@ window.addEventListener("afterprint", () => {
   }
 });
 
-// ---------- bindings ----------
-function syncURL() {
-  const colors = getPickerColors();
-  const params = new URLSearchParams({
-    n: els.name?.value || "",
-    u: els.username?.value || "",
-    d: els.birthday?.value || "",
-    bg: colors.bg,
-    ink: colors.ink,
-    kw: colors.kw,
-    mod: colors.mod,
-    func: colors.func,
-    str: colors.str,
-    num: colors.num,
-    border: colors.border,
-    codebg: colors.codebg,
-    punct: colors.punct,
-  });
-  history.replaceState(null, "", `${location.pathname}?${params.toString()}`);
-}
-function bind() {
-  ["input", "change"].forEach((ev) => {
-    els.name?.addEventListener(ev, applyInputs);
-    els.username?.addEventListener(ev, applyInputs);
-    els.birthday?.addEventListener(ev, applyInputs);
-    els.name?.addEventListener(ev, syncURL);
-    els.username?.addEventListener(ev, syncURL);
-    els.birthday?.addEventListener(ev, syncURL);
-  });
-  function debounce(fn, ms = 80) {
-    let t;
-    return (...a) => {
-      clearTimeout(t);
-      t = setTimeout(() => fn(...a), ms);
-    };
+// ---------- Avatar / Logo ----------
+
+function initAvatar() {
+  if (!els.avatar && !els.logoFile && !els.btnLogoRemove) return;
+
+  const dz = document.querySelector(".file-drop");
+  const dzHint = document.querySelector(".file-drop .file-drop__hint");
+  const sw = document.querySelector(".logo-actions .switch");
+  const hideInput = document.getElementById("logo-hide-export");
+
+  const setHint = (text) => {
+    if (dzHint) dzHint.textContent = text;
+  };
+
+  const revokeAvatarURL = () => {
+    const url = els.avatar?.dataset?.url;
+    if (!url) return;
+    try { URL.revokeObjectURL(url); } catch {}
+    if (els.avatar?.dataset) delete els.avatar.dataset.url;
+  };
+
+  const setHideSwitchEnabled = (enabled) => {
+    if (!sw || !hideInput) return;
+    sw.classList.toggle("is-disabled", !enabled);
+    hideInput.disabled = !enabled;
+  };
+
+  const syncAvatarHideClass = () => {
+    if (!els.avatar) return;
+    els.avatar.classList.toggle("hide-on-export", !!els.logoHideExport?.checked);
+  };
+
+  const applyAvatar = (file) => {
+    if (!els.avatar || !file) return;
+    if (!file.type?.startsWith("image/")) {
+      alert("Please choose an image file.");
+      return;
+    }
+    if (file.size > 6 * 1024 * 1024) {
+      alert("Image is larger than 6MB.");
+      return;
+    }
+    revokeAvatarURL();
+    const url = URL.createObjectURL(file);
+    els.avatar.src = url;
+    els.avatar.dataset.url = url;
+    els.avatar.classList.add("is-visible");
+    els.avatar.style.display = "";
+    setHint(file.name || "Click or drop an image");
+    setHideSwitchEnabled(true);
+    syncAvatarHideClass();
+  };
+
+  const clearAvatar = () => {
+    if (!els.avatar) return;
+    els.avatar.classList.remove("is-visible");
+    revokeAvatarURL();
+    els.avatar.removeAttribute("src");
+    els.avatar.style.display = "none";
+    if (els.logoFile) els.logoFile.value = "";
+    setHint("Click or drop an image");
+    if (hideInput) hideInput.checked = false;
+    setHideSwitchEnabled(false);
+  };
+
+  const handleFileList = (files) => {
+    const file = files?.[0];
+    if (file) applyAvatar(file);
+  };
+
+  if (els.logoFile) {
+    els.logoFile.addEventListener("change", () => {
+      handleFileList(els.logoFile.files);
+      setHideSwitchEnabled(!!els.logoFile.files?.[0]);
+    });
   }
-  const applyThemeFromPickersDebounced = debounce(applyThemeFromPickers, 60);
-  [
-    els.clrBg,
-    els.clrInk,
-    els.clrKw,
-    els.clrMod,
-    els.clrFunc,
-    els.clrStr,
-    els.clrNum,
-    els.clrBorder,
-    els.clrCodeBg,
-    els.clrPunct,
-  ].forEach((el) => {
+
+  if (els.btnLogoRemove) {
+    els.btnLogoRemove.addEventListener("click", clearAvatar);
+  }
+
+  if (dz && els.logoFile) {
+    const prevent = (e) => e.preventDefault();
+    ["dragenter", "dragover"].forEach((evt) =>
+      dz.addEventListener(evt, (e) => {
+        prevent(e);
+        dz.classList.add("is-dragover");
+      })
+    );
+    ["dragleave", "drop"].forEach((evt) =>
+      dz.addEventListener(evt, (e) => {
+        prevent(e);
+        dz.classList.remove("is-dragover");
+      })
+    );
+    dz.addEventListener("drop", (e) => {
+      const file = e.dataTransfer?.files?.[0];
+      if (!file) return;
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      els.logoFile.files = dt.files;
+      handleFileList(els.logoFile.files);
+    });
+  }
+
+  if (els.logoHideExport) {
+    els.logoHideExport.addEventListener("change", syncAvatarHideClass);
+  }
+
+  const hasAvatar = !!(els.avatar && els.avatar.src);
+  setHideSwitchEnabled(hasAvatar);
+  syncAvatarHideClass();
+  if (hasAvatar) els.avatar.classList.add("is-visible");
+}
+
+// ---------- Color presets ----------
+
+const PRESETS = {
+  warm: {
+    bg: "#ffffff", ink: "#222222", kw: "#ff5722", mod: "#8e24aa",
+    func: "#2e7d32", str: "#1565c0", num: "#d32f2f",
+    border: "#e0e0e0", codebg: "#fafafa", punct: "#444444",
+  },
+  cool: {
+    bg: "#ffffff", ink: "#1a1a1a", kw: "#00acc1", mod: "#3949ab",
+    func: "#00897b", str: "#1976d2", num: "#e53935",
+    border: "#e0e0e0", codebg: "#f6f8fb", punct: "#3a3f47",
+  },
+  dark: {
+    bg: "#121212", ink: "#f5f5f5", kw: "#ff8a65", mod: "#ba68c8",
+    func: "#81c784", str: "#64b5f6", num: "#ef5350",
+    border: "#333333", codebg: "#1e1e1e", punct: "#cccccc",
+  },
+};
+
+// ---------- Bindings ----------
+
+function bind() {
+  const textInputs = [els.name, els.username, els.birthday];
+  ["input", "change"].forEach((ev) => {
+    textInputs.forEach((el) => {
+      el?.addEventListener(ev, applyInputs);
+      el?.addEventListener(ev, syncURL);
+    });
+  });
+
+  const colorPickers = [
+    els.clrBg, els.clrInk, els.clrKw, els.clrMod, els.clrFunc,
+    els.clrStr, els.clrNum, els.clrBorder, els.clrCodeBg, els.clrPunct,
+  ];
+  const applyThemeDebounced = debounce(applyThemeFromPickers, 60);
+  colorPickers.forEach((el) => {
     if (!el) return;
-    el.addEventListener("input", (e) => {
-      applyThemeFromPickersDebounced(e);
+    el.addEventListener("input", () => {
+      applyThemeDebounced();
       syncURL();
     });
-    el.addEventListener("change", (e) => {
-      applyThemeFromPickers(e);
+    el.addEventListener("change", () => {
+      applyThemeFromPickers();
       syncURL();
     });
   });
 
-  if (els.presetWarm)
-    els.presetWarm.onclick = () =>
-      applyTheme({
-        bg: "#ffffff",
-        ink: "#222222",
-        kw: "#ff5722",
-        mod: "#8e24aa",
-        func: "#2e7d32",
-        str: "#1565c0",
-        num: "#d32f2f",
-        border: "#e0e0e0",
-        codebg: "#fafafa",
-        punct: "#444444",
-      });
-  if (els.presetCool)
-    els.presetCool.onclick = () =>
-      applyTheme({
-        bg: "#ffffff",
-        ink: "#1a1a1a",
-        kw: "#00acc1",
-        mod: "#3949ab",
-        func: "#00897b",
-        str: "#1976d2",
-        num: "#e53935",
-        border: "#e0e0e0",
-        codebg: "#f6f8fb",
-        punct: "#3a3f47",
-      });
-  if (els.presetDark)
-    els.presetDark.onclick = () =>
-      applyTheme({
-        bg: "#121212",
-        ink: "#f5f5f5",
-        kw: "#ff8a65",
-        mod: "#ba68c8",
-        func: "#81c784",
-        str: "#64b5f6",
-        num: "#ef5350",
-        border: "#333333",
-        codebg: "#1e1e1e",
-        punct: "#cccccc",
-      });
+  // Presets
+  if (els.presetWarm) els.presetWarm.onclick = () => applyTheme(PRESETS.warm);
+  if (els.presetCool) els.presetCool.onclick = () => applyTheme(PRESETS.cool);
+  if (els.presetDark) els.presetDark.onclick = () => applyTheme(PRESETS.dark);
 
+  // Export buttons
   if (els.btnPNG) els.btnPNG.onclick = savePNG;
   if (els.btnPDF) els.btnPDF.onclick = savePDF;
   if (els.btnPrint) els.btnPrint.onclick = () => window.print();
-  if (els.btnShare)
+
+  // Share link
+  if (els.btnShare) {
     els.btnShare.onclick = async () => {
       const url = makeShareURL();
       try {
@@ -636,168 +689,43 @@ function bind() {
         setTimeout(() => (els.btnShare.textContent = "Share Link"), 1200);
       }
     };
+  }
+
+  // Ripple effect
   document.addEventListener("click", (e) => {
     const b = e.target.closest(".btn--ripple");
     if (!b) return;
     b.classList.remove("is-rippling");
-    void b.offsetWidth; // restart
+    void b.offsetWidth;
     b.classList.add("is-rippling");
     setTimeout(() => b.classList.remove("is-rippling"), 420);
   });
 
-  // ---- Avatar / Logo handlers (final, optimized) ----
-  (() => {
-    if (!els.avatar && !els.logoFile && !els.btnLogoRemove) return;
+  // Avatar
+  initAvatar();
 
-    // cache common nodes
-    const dz = document.querySelector(".file-drop");
-    const dzHint = document.querySelector(".file-drop .file-drop__hint");
-    const sw = document.querySelector(".logo-actions .switch");
-    const hideInput = document.getElementById("logo-hide-export");
-
-    // helpers
-    const setHint = (text) => {
-      if (dzHint) dzHint.textContent = text;
-    };
-
-    const revokeAvatarURL = () => {
-      const url = els.avatar?.dataset?.url;
-      if (!url) return;
-      try {
-        URL.revokeObjectURL(url);
-      } catch {}
-      if (els.avatar?.dataset) delete els.avatar.dataset.url;
-    };
-
-    const setHideSwitchEnabled = (enabled) => {
-      if (!sw || !hideInput) return;
-      sw.classList.toggle("is-disabled", !enabled);
-      hideInput.disabled = !enabled;
-    };
-
-    const syncAvatarHideClass = () => {
-      if (!els.avatar) return;
-      const hide = !!els.logoHideExport?.checked;
-      els.avatar.classList.toggle("hide-on-export", hide);
-    };
-
-    const applyAvatar = (file) => {
-      if (!els.avatar || !file) return;
-      if (!file.type?.startsWith("image/")) {
-        alert("Please choose an image file.");
-        return;
-      }
-      if (file.size > 6 * 1024 * 1024) {
-        alert("Image is larger than 6MB.");
-        return;
-      }
-      revokeAvatarURL();
-      const url = URL.createObjectURL(file);
-      els.avatar.src = url;
-      els.avatar.dataset.url = url;
-      els.avatar.classList.add("is-visible");
-      els.avatar.style.display = "";
-      setHint(file.name || "Click or drop an image");
-      setHideSwitchEnabled(true);
-      syncAvatarHideClass();
-    };
-
-    const clearAvatar = () => {
-      if (!els.avatar) return;
-      els.avatar.classList.remove("is-visible");
-      revokeAvatarURL();
-      els.avatar.removeAttribute("src");
-      els.avatar.style.display = "none";
-      if (els.logoFile) els.logoFile.value = "";
-      setHint("Click or drop an image");
-      if (hideInput) hideInput.checked = false;
-      setHideSwitchEnabled(false);
-    };
-
-    const handleFileList = (files) => {
-      const file = files?.[0];
-      if (!file) return;
-      applyAvatar(file);
-    };
-
-    // input: file change
-    if (els.logoFile) {
-      els.logoFile.addEventListener("change", () =>
-        handleFileList(els.logoFile.files)
-      );
-      // also keep switch state in sync
-      els.logoFile.addEventListener("change", () =>
-        setHideSwitchEnabled(!!els.logoFile.files?.[0])
-      );
-    }
-
-    // remove button
-    if (els.btnLogoRemove) {
-      els.btnLogoRemove.addEventListener("click", () => {
-        clearAvatar();
-      });
-    }
-
-    // dropzone: drag & drop
-    if (dz && els.logoFile) {
-      const enterOver = (e) => {
-        e.preventDefault();
-        dz.classList.add("is-dragover");
-      };
-      const leaveDrop = (e) => {
-        e.preventDefault();
-        dz.classList.remove("is-dragover");
-      };
-
-      ["dragenter", "dragover"].forEach((evt) =>
-        dz.addEventListener(evt, enterOver)
-      );
-      ["dragleave", "drop"].forEach((evt) =>
-        dz.addEventListener(evt, leaveDrop)
-      );
-
-      dz.addEventListener("drop", (e) => {
-        const file = e.dataTransfer?.files?.[0];
-        if (!file) return;
-        // mirror into hidden input so browser state stays consistent
-        const dt = new DataTransfer();
-        dt.items.add(file);
-        els.logoFile.files = dt.files;
-        handleFileList(els.logoFile.files);
-      });
-    }
-
-    // hide-on-export toggle
-    if (els.logoHideExport) {
-      els.logoHideExport.addEventListener("change", syncAvatarHideClass);
-    }
-
-    // initial state (bind() runs after DOMContentLoaded)
-    const hasAvatar = !!(els.avatar && els.avatar.src);
-    setHideSwitchEnabled(hasAvatar);
-    syncAvatarHideClass();
-    if (hasAvatar) els.avatar.classList.add("is-visible");
-  })();
-
-  if (els.btnResetColors)
+  // Color action buttons
+  if (els.btnResetColors) {
     els.btnResetColors.onclick = () => {
-      setPickers(defaults.colors);
-      applyTheme(defaults.colors);
+      setPickers(DEFAULT_COLORS);
+      applyTheme(DEFAULT_COLORS);
     };
-  if (els.btnRandomColors)
+  }
+  if (els.btnRandomColors) {
     els.btnRandomColors.onclick = () => {
       const p = randomPalette();
       setPickers(p);
       applyTheme(p);
     };
-  if (els.btnSaveTheme)
+  }
+  if (els.btnSaveTheme) {
     els.btnSaveTheme.onclick = () => {
-      const c = getPickerColors();
-      saveTheme(c);
+      saveTheme(getPickerColors());
       els.btnSaveTheme.textContent = "Saved ✓";
       setTimeout(() => (els.btnSaveTheme.textContent = "Save"), 1000);
     };
-  if (els.btnLoadTheme)
+  }
+  if (els.btnLoadTheme) {
     els.btnLoadTheme.onclick = () => {
       const c = loadTheme();
       if (c) {
@@ -808,14 +736,15 @@ function bind() {
         setTimeout(() => (els.btnLoadTheme.textContent = "Load"), 1000);
       }
     };
-  if (els.btnCopyCSS)
+  }
+  if (els.btnCopyCSS) {
     els.btnCopyCSS.onclick = async () => {
       await copyCssVars(getPickerColors());
       els.btnCopyCSS.textContent = "Copied ✓";
       setTimeout(() => (els.btnCopyCSS.textContent = "Copy CSS"), 1000);
     };
-
-  if (els.btnExportTheme)
+  }
+  if (els.btnExportTheme) {
     els.btnExportTheme.onclick = () => {
       const blob = new Blob([JSON.stringify(getPickerColors(), null, 2)], {
         type: "application/json",
@@ -827,9 +756,11 @@ function bind() {
       a.click();
       URL.revokeObjectURL(url);
     };
-  if (els.btnImportTheme)
+  }
+  if (els.btnImportTheme) {
     els.btnImportTheme.onclick = () => els.inpImportTheme?.click();
-  if (els.inpImportTheme)
+  }
+  if (els.inpImportTheme) {
     els.inpImportTheme.onchange = async (e) => {
       const file = e.target.files?.[0];
       if (!file) return;
@@ -843,9 +774,11 @@ function bind() {
         e.target.value = "";
       }
     };
+  }
 }
 
-// ---------- boot ----------
+// ---------- Boot ----------
+
 window.addEventListener("DOMContentLoaded", () => {
   THEME_KEY = cfg.themeKey;
   loadDefaults();

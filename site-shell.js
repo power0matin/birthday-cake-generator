@@ -1,8 +1,9 @@
-// site-shell.js — header/menu + back-to-top (animated)
+// site-shell.js — header/menu + back-to-top
 (() => {
   function easeInOutCubic(t) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   }
+
   function scrollToTopAnimated(duration = 700) {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       window.scrollTo(0, 0);
@@ -20,26 +21,27 @@
   }
 
   function init() {
-    // سال فوتر
-    const y = document.getElementById("site-year");
-    if (y) y.textContent = new Date().getFullYear();
+    // Footer year
+    const yearEl = document.getElementById("site-year");
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-    // منوی موبایل
+    // Mobile menu
     const btn = document.querySelector(".nav-toggle");
     const nav = document.getElementById("site-nav");
     if (btn && nav) {
       btn.addEventListener("click", () => {
         const open = nav.classList.toggle("open");
         btn.setAttribute("aria-expanded", String(open));
+        btn.classList.toggle("is-open", open);
       });
       document.addEventListener("click", (e) => {
         if (!nav.classList.contains("open")) return;
         if (!(nav.contains(e.target) || btn.contains(e.target))) {
           nav.classList.remove("open");
           btn.setAttribute("aria-expanded", "false");
+          btn.classList.remove("is-open");
         }
       });
-      // لینک‌هایی که اسکرول داخلی دارند
       nav.querySelectorAll("[data-scroll]").forEach((a) => {
         a.addEventListener("click", (e) => {
           e.preventDefault();
@@ -48,10 +50,12 @@
           if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
           nav.classList.remove("open");
           btn.setAttribute("aria-expanded", "false");
+          btn.classList.remove("is-open");
         });
       });
     }
 
+    // Compact header on scroll
     let lastY = 0;
     addEventListener(
       "scroll",
@@ -65,7 +69,7 @@
       { passive: true }
     );
 
-    // back-to-top
+    // Back-to-top
     const toTopBtn = document.getElementById("back-to-top");
     if (toTopBtn) {
       const showAfter = 220;
@@ -78,12 +82,11 @@
         e.preventDefault();
         toTopBtn.classList.add("rippling");
         setTimeout(() => toTopBtn.classList.remove("rippling"), 360);
-        scrollToTopAnimated(700); // ← سرعت
+        scrollToTopAnimated(700);
       });
     }
   }
 
-  // اطمینان از اجرای به‌موقع
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
   } else {

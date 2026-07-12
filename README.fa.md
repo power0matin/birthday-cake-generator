@@ -135,7 +135,7 @@ n, u, d, bg, ink, kw, mod, func, str, num, border, codebg, punct
 
 - **اکسپورت**: `html-to-image` (PNG)، `jsPDF` (PDF A4 افقی)
 - **چاپ**: قوانین `@page`؛ مخفی‌کردن پنل؛ حاشیهٔ امن
-- **تایپوگرافی**: JetBrains Mono
+- **تایپوگرافی**: Inter (رابط کاربری)، Fira Code (بلوک کد)، Vazirmatn (فارسی)
 - **پایداری**: بررسی بارگذاری کتابخانه‌ها، آزادسازی ObjectURL، همگام‌سازی قبل از چاپ
 
 ## ♿ دسترس‌پذیری
@@ -166,7 +166,7 @@ docs: update README with URL params
 
 ## 🙌 سازنده
 
-ساخته‌شده با ❤️ توسط [power0matin](https://github.com/power0matin) · فونت: [JetBrains Mono](https://fonts.google.com/specimen/JetBrains+Mono)
+ساخته‌شده با ❤️ توسط [power0matin](https://github.com/power0matin) · فونت‌ها: [Inter](https://fonts.google.com/specimen/Inter)، [Fira Code](https://fonts.google.com/specimen/Fira+Code)، [Vazirmatn](https://fonts.google.com/specimen/Vazirmatn)
 
 ## 🧾 تغییرات
 
